@@ -2,11 +2,150 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Jurnal MBG</title>
+  <title>MBG Journal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Jurnal MBG</h1>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">M</div>
+      <div>
+        <h6>MBG Journal</h6>
+        <small>School System</small>
+      </div>
+    </div>
+
+    <nav>
+      <button class="active" onclick="showPage('dashboard', this)">Dashboard</button>
+      <button onclick="showPage('incoming', this)">Incoming</button>
+      <button onclick="showPage('distribution', this)">Distribution</button>
+      <button onclick="showPage('return', this)">Return</button>
+      <button onclick="showPage('reports', this)">Reports</button>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="content">
+
+    <!-- DASHBOARD -->
+    <section id="dashboard">
+      <h2>Dashboard</h2>
+      <p class="text-muted">Overview of MBG stock and recent activities.</p>
+
+      <div class="row g-3 mb-4">
+        <div class="col-md-3">
+          <div class="stat-card blue">
+            <small>CURRENT STOCK</small>
+            <h3 id="dStock">0</h3>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-card green">
+            <small>TOTAL RECEIVED</small>
+            <h3 id="dIn">0</h3>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-card yellow">
+            <small>TOTAL DISTRIBUTED</small>
+            <h3 id="dOut">0</h3>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-card purple">
+            <small>TOTAL RETURNED</small>
+            <h3 id="dReturn">0</h3>
+          </div>
+        </div>
+      </div>
+      <div class="card-box mb-4" id="dailyStockBox">
+        <h5>Daily Stock Setup</h5>
+        <p class="text-muted">Set initial MBG stock for today</p>
+
+        <input type="number" id="dailyQty" class="form-control mb-2" placeholder="Initial stock quantity">
+        <textarea id="dailyNote" class="form-control mb-3" placeholder="Notes (optional)"></textarea>
+
+        <button class="btn btn-primary" onclick="saveDailyStock()">Save Daily Stock</button>
+      </div>
+      <div class="card-box">
+        <h5>Recent Activity</h5>
+        <ul id="recentActivity" class="activity-list"></ul>
+      </div>
+    </section>
+
+    <!-- INCOMING -->
+    <section id="incoming" class="d-none">
+      <h2>Incoming MBG</h2>
+      <p class="text-muted">Record new stock arriving from the kitchen.</p>
+
+      <div class="form-card">
+        <h5>Receive MBG</h5>
+        <input type="date" id="inDate" class="form-control mb-3">
+        <input type="number" id="inQty" class="form-control mb-3" placeholder="Quantity">
+        <textarea id="inNotes" class="form-control mb-3" placeholder="Notes"></textarea>
+        <button class="btn btn-primary w-100" onclick="addIncoming()">Submit Incoming</button>
+      </div>
+    </section>
+
+    <!-- DISTRIBUTION -->
+    <section id="distribution" class="d-none">
+      <h2>Distribution</h2>
+      <p class="text-muted">Distribute MBG stock to classes.</p>
+
+      <div class="form-card">
+        <input type="date" id="outDate" class="form-control mb-3">
+        <input type="number" id="outQty" class="form-control mb-3" placeholder="Quantity">
+        <input type="text" id="outClass" class="form-control mb-3" placeholder="Class Name">
+        <input type="text" id="outRep" class="form-control mb-3" placeholder="Representative">
+        <button class="btn btn-primary w-100" onclick="addDistribution()">Submit Distribution</button>
+      </div>
+    </section>
+
+    <!-- RETURN -->
+    <section id="return" class="d-none">
+      <h2>Returns</h2>
+      <p class="text-muted">Record items returned by classes.</p>
+
+      <div class="form-card">
+        <input type="date" id="retDate" class="form-control mb-3">
+        <input type="number" id="retQty" class="form-control mb-3" placeholder="Quantity">
+        <input type="text" id="retClass" class="form-control mb-3" placeholder="Class Name">
+        <input type="text" id="retRep" class="form-control mb-3" placeholder="Representative">
+        <button class="btn btn-primary w-100" onclick="addReturn()">Submit Return</button>
+      </div>
+    </section>
+
+    <!-- REPORTS -->
+    <section id="reports" class="d-none">
+      <h2>Reports & History</h2>
+
+      <div class="card-box">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Details</th>
+              <th>Rep</th>
+              <th>Qty</th>
+            </tr>
+          </thead>
+          <tbody id="reportTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>

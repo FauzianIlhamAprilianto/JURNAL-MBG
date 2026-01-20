@@ -1,0 +1,92 @@
+body {
+  margin: 0;
+  background: #f6f8fc;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.app {
+  display: flex;
+  height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 260px;
+  background: #fff;
+  border-right: 1px solid #eee;
+  padding: 20px;
+}
+
+.brand {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  background: #2563eb;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.sidebar nav button {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 12px 15px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.sidebar nav button.active,
+.sidebar nav button:hover {
+  background: #2563eb;
+  color: #fff;
+}
+
+/* Content */
+.content {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+/* Cards */
+.stat-card {
+  padding: 20px;
+  border-radius: 14px;
+  font-weight: bold;
+}
+
+.stat-card.blue { background: #eef4ff; color: #2563eb; }
+.stat-card.green { background: #e9f9f1; color: #16a34a; }
+.stat-card.yellow { background: #fff7e6; color: #d97706; }
+.stat-card.purple { background: #f5ecff; color: #7c3aed; }
+
+.card-box {
+  background: #fff;
+  padding: 20px;
+  border-radius: 14px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.03);
+}
+
+.form-card {
+  max-width: 600px;
+  background: #fff;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+.activity-list {
+  list-style: none;
+  padding: 0;
+}
