@@ -7,7 +7,7 @@ const db = JSON.parse(localStorage.getItem("mbg")) || {
 function save() {
   localStorage.setItem("mbg", JSON.stringify(db));
   renderDashboard();
-  renderReport();
+  renderReportTable(getAllTransactions());
 }
 
 function showPage(id, btn) {
@@ -47,23 +47,95 @@ function renderDashboard() {
   dReturn.textContent = db.returns.reduce((a,b)=>a+b.qty,0);
 }
 
-function renderReport() {
+// REPORT
+function renderReportTable(list) {
   reportTable.innerHTML = "";
-  [...db.incoming.map(d=>({...d,type:"IN"})),
-   ...db.distribution.map(d=>({...d,type:"OUT"})),
-   ...db.returns.map(d=>({...d,type:"RETURN"}))]
-   .sort((a,b)=>b.date.localeCompare(a.date))
-   .forEach(d=>{
-     reportTable.innerHTML += `
+
+  list.forEach((d, i) => {
+    const badge =
+      d.type === "INCOMING" ? "badge-in" :
+      d.type === "DISTRIBUTION" ? "badge-out" :
+      "badge-return";
+
+    reportTable.innerHTML += `
       <tr>
         <td>${d.date}</td>
-        <td>${d.type}</td>
-        <td>${d.class || 'MBG Kitchen'}</td>
-        <td>${d.rep || '-'}</td>
-        <td>${d.qty}</td>
-      </tr>`;
-   });
+        <td><span class="badge-type ${badge}">${d.type}</span></td>
+        <td>
+          <strong>${d.details}</strong><br>
+          <small class="text-muted">${d.note || ""}</small>
+        </td>
+        <td>${d.rep || "-"}</td>
+        <td class="fw-bold">${d.qty}</td>
+        <td>
+          <span class="action-delete" onclick="deleteTransaction(${i})">🗑</span>
+        </td>
+      </tr>
+    `;
+  });
 }
 
+
+function getAllTransactions() {
+  return [
+    ...db.incoming.map(d => ({
+      type:"INCOMING", date:d.date, qty:d.qty,
+      details:"MBG Kitchen", note:d.notes
+    })),
+    ...db.distribution.map(d => ({
+      type:"DISTRIBUTION", date:d.date, qty:d.qty,
+      details:d.class, rep:d.rep, note:d.note
+    })),
+    ...db.returns.map(d => ({
+      type:"RETURN", date:d.date, qty:d.qty,
+      details:d.class, rep:d.rep, note:d.note
+    }))
+  ].sort((a,b)=>b.date.localeCompare(a.date));
+}
+
+function applyReportFilter() {
+  let list = getAllTransactions();
+
+  if (filterType.value !== "ALL") {
+    list = list.filter(d => d.type === filterType.value);
+  }
+
+  if (filterFrom.value) {
+    list = list.filter(d => d.date >= filterFrom.value);
+  }
+
+  if (filterTo.value) {
+    list = list.filter(d => d.date <= filterTo.value);
+  }
+  renderReportTable(list);
+}
+
+function deleteTransaction(index) {
+  if (!confirm("Delete this transaction?")) return;
+
+  const all = getAllTransactions();
+  const item = all[index];
+
+  if (item.type === "INCOMING") {
+    db.incoming.splice(db.incoming.findIndex(d =>
+      d.date === item.date && d.qty === item.qty), 1);
+  }
+
+  if (item.type === "DISTRIBUTION") {
+    db.distribution.splice(db.distribution.findIndex(d =>
+      d.date === item.date && d.qty === item.qty), 1);
+  }
+
+  if (item.type === "RETURN") {
+    db.returns.splice(db.returns.findIndex(d =>
+      d.date === item.date && d.qty === item.qty), 1);
+  }
+
+  save();
+  applyReportFilter();
+}
+
+
+
 renderDashboard();
-renderReport();
+renderReportTable(getAllTransactions());

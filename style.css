@@ -90,3 +90,33 @@ body {
   list-style: none;
   padding: 0;
 }
+/* BADGE */
+.badge-type {
+  padding: 4px 10px;
+  font-size: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.badge-in {
+  background: #e9f9f1;
+  color: #16a34a;
+  border: 1px solid #16a34a;
+}
+
+.badge-out {
+  background: #fff7e6;
+  color: #d97706;
+  border: 1px solid #d97706;
+}
+
+.badge-return {
+  background: #f5ecff;
+  color: #7c3aed;
+  border: 1px solid #7c3aed;
+}
+
+.action-delete {
+  color: red;
+  cursor: pointer;
+}
