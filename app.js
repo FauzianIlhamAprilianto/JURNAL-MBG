@@ -1,3 +1,12 @@
+const dStock = document.getElementById('dStock');
+const dIn = document.getElementById('dIn');
+const dOut = document.getElementById('dOut');
+const dReturn = document.getElementById('dReturn');
+const dStockReport = document.getElementById('dStockReport');
+const dInReport = document.getElementById('dInReport');
+const dOutReport = document.getElementById('dOutReport');
+const dReturnReport = document.getElementById('dReturnReport');
+
 const db = JSON.parse(localStorage.getItem("mbg")) || {
   incoming: [],
   distribution: [],
@@ -45,6 +54,10 @@ function renderDashboard() {
   dIn.textContent = db.incoming.reduce((a,b)=>a+b.qty,0);
   dOut.textContent = db.distribution.reduce((a,b)=>a+b.qty,0);
   dReturn.textContent = db.returns.reduce((a,b)=>a+b.qty,0);
+  dStockReport.textContent = stock();
+  dInReport.textContent = db.incoming.reduce((a,b)=>a+b.qty,0);
+  dOutReport.textContent = db.distribution.reduce((a,b)=>a+b.qty,0);
+  dReturnReport.textContent = db.returns.reduce((a,b)=>a+b.qty,0);
 }
 
 // REPORT
@@ -84,11 +97,11 @@ function getAllTransactions() {
     })),
     ...db.distribution.map(d => ({
       type:"DISTRIBUTION", date:d.date, qty:d.qty,
-      details:d.class, rep:d.rep, note:d.note
+      details:d.class, rep:d.rep, note:d.notes
     })),
     ...db.returns.map(d => ({
       type:"RETURN", date:d.date, qty:d.qty,
-      details:d.class, rep:d.rep, note:d.note
+      details:d.class, rep:d.rep, note:d.notes
     }))
   ].sort((a,b)=>b.date.localeCompare(a.date));
 }
