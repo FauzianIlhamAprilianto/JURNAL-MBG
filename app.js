@@ -6,6 +6,14 @@ const dStockReport = document.getElementById('dStockReport');
 const dInReport = document.getElementById('dInReport');
 const dOutReport = document.getElementById('dOutReport');
 const dReturnReport = document.getElementById('dReturnReport');
+const today = new Date().toISOString().split("T")[0];
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll('input[type="date"]').forEach(i => {
+    i.value = today;
+  });
+});
+
 
 const db = JSON.parse(localStorage.getItem("mbg")) || {
   incoming: [],
@@ -58,6 +66,9 @@ function renderDashboard() {
   dInReport.textContent = db.incoming.reduce((a,b)=>a+b.qty,0);
   dOutReport.textContent = db.distribution.reduce((a,b)=>a+b.qty,0);
   dReturnReport.textContent = db.returns.reduce((a,b)=>a+b.qty,0);
+  document.getElementById("incomingStock").textContent = stock();
+  document.getElementById("distStock").textContent = stock();
+  document.getElementById("returnStock").textContent = stock();
 }
 
 // REPORT

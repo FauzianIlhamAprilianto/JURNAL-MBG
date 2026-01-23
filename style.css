@@ -120,3 +120,40 @@ body {
   color: red;
   cursor: pointer;
 }
+
+.page-section {
+  padding: 32px;
+}
+
+.incoming-card {
+  max-width: 720px;
+  margin: 0 auto;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.06);
+}
+
+.badge-stock {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.badge-stock i {
+  color: #2563eb;
+}
+
+.form-control,
+.form-select {
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+
+.btn-primary {
+  border-radius: 12px;
+  font-weight: 600;
+}

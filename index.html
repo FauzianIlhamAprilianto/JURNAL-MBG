@@ -74,44 +74,206 @@
     </section>
 
     <!-- INCOMING -->
-    <section id="incoming" class="d-none">
-      <h2>Incoming MBG</h2>
-      <p class="text-muted">Record new stock arriving from the kitchen.</p>
+    <section id="incoming" class="page-section d-none">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2 class="fw-bold mb-1">Incoming MBG</h2>
+          <p class="text-muted mb-0">Record new stock arriving from the kitchen.</p>
+        </div>
 
-      <div class="form-card">
-        <h5>Receive MBG</h5>
-        <input type="date" id="inDate" class="form-control mb-3">
-        <input type="number" id="inQty" class="form-control mb-3" placeholder="Quantity">
-        <textarea id="inNotes" class="form-control mb-3" placeholder="Notes"></textarea>
-        <button class="btn btn-primary w-100" onclick="addIncoming()">Submit Incoming</button>
+        <div class="badge-stock">
+          <i class="bi bi-box-seam"></i>
+          Current Stock: <span id="incomingStock">0</span>
+        </div>
+      </div>
+
+      <div class="card incoming-card">
+        <div class="card-body">
+          <h4 class="text-primary fw-bold mb-1">Receive MBG</h4>
+          <p class="text-muted mb-4">
+            Enter details of the MBG delivery from the kitchen.
+          </p>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Date</label>
+              <input type="date" id="inDate" class="form-control">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Quantity</label>
+              <input type="number" id="inQty" class="form-control" min="1">
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Source</label>
+              <select class="form-select">
+                <option>MBG Kitchen</option>
+              </select>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Notes (Optional)</label>
+              <textarea
+                id="inNotes"
+                class="form-control"
+                rows="4"
+                placeholder="Any additional details..."></textarea>
+            </div>
+          </div>
+
+          <button
+            class="btn btn-primary w-100 mt-4 py-2"
+            onclick="addIncoming()">
+            Submit Incoming
+          </button>
+        </div>
       </div>
     </section>
 
     <!-- DISTRIBUTION -->
-    <section id="distribution" class="d-none">
-      <h2>Distribution</h2>
-      <p class="text-muted">Distribute MBG stock to classes.</p>
+    <section id="distribution" class="page-section d-none">
+      <!-- Header -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2 class="fw-bold mb-1">Distribution</h2>
+          <p class="text-muted mb-0">Distribute MBG stock to classes.</p>
+        </div>
 
-      <div class="form-card">
-        <input type="date" id="outDate" class="form-control mb-3">
-        <input type="number" id="outQty" class="form-control mb-3" placeholder="Quantity">
-        <input type="text" id="outClass" class="form-control mb-3" placeholder="Class Name">
-        <input type="text" id="outRep" class="form-control mb-3" placeholder="Representative">
-        <button class="btn btn-primary w-100" onclick="addDistribution()">Submit Distribution</button>
+        <div class="badge-stock">
+          <i class="bi bi-box-arrow-up"></i>
+          Available to Distribute:
+          <span id="distStock">0</span>
+        </div>
+      </div>
+
+      <!-- Card -->
+      <div class="card incoming-card">
+        <div class="card-body">
+          <h4 class="text-primary fw-bold mb-1">Distribute to Class</h4>
+          <p class="text-muted mb-4">
+            Record items being taken by a class representative.
+          </p>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Date</label>
+              <input type="date" id="outDate" class="form-control">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Quantity</label>
+              <input type="number" id="outQty" class="form-control" min="1">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Class Name</label>
+              <input
+                type="text"
+                id="outClass"
+                class="form-control"
+                placeholder="e.g. Grade 1A">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Representative Name</label>
+              <input
+                type="text"
+                id="outRep"
+                class="form-control"
+                placeholder="Person responsible">
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Notes (Optional)</label>
+              <textarea
+                class="form-control"
+                rows="4"
+                placeholder="Any additional details..."></textarea>
+            </div>
+          </div>
+
+          <button
+            class="btn btn-primary w-100 mt-4 py-2"
+            onclick="addDistribution()">
+            Submit Distribution
+          </button>
+        </div>
       </div>
     </section>
 
-    <!-- RETURN -->
-    <section id="return" class="d-none">
-      <h2>Returns</h2>
-      <p class="text-muted">Record items returned by classes.</p>
 
-      <div class="form-card">
-        <input type="date" id="retDate" class="form-control mb-3">
-        <input type="number" id="retQty" class="form-control mb-3" placeholder="Quantity">
-        <input type="text" id="retClass" class="form-control mb-3" placeholder="Class Name">
-        <input type="text" id="retRep" class="form-control mb-3" placeholder="Representative">
-        <button class="btn btn-primary w-100" onclick="addReturn()">Submit Return</button>
+    <!-- RETURN -->
+    <section id="return" class="page-section d-none">
+      <!-- Header -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2 class="fw-bold mb-1">Returns</h2>
+          <p class="text-muted mb-0">
+            Record items returned by classes back to stock.
+          </p>
+        </div>
+
+        <div class="badge-stock badge-purple">
+          <i class="bi bi-arrow-counterclockwise"></i>
+          Current Stock:
+          <span id="returnStock">0</span>
+        </div>
+      </div>
+
+      <!-- Card -->
+      <div class="card incoming-card">
+        <div class="card-body">
+          <h4 class="text-primary fw-bold mb-1">Class Return</h4>
+          <p class="text-muted mb-4">
+            Enter details of MBG items being returned.
+          </p>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Date</label>
+              <input type="date" id="retDate" class="form-control">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Quantity</label>
+              <input type="number" id="retQty" class="form-control" min="1">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Class Name</label>
+              <input
+                type="text"
+                id="retClass"
+                class="form-control"
+                placeholder="e.g. Grade 1A">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Representative Name</label>
+              <input
+                type="text"
+                id="retRep"
+                class="form-control"
+                placeholder="Person responsible">
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Notes (Optional)</label>
+              <textarea
+                id="retNote"
+                class="form-control"
+                rows="4"
+                placeholder="Any additional details..."></textarea>
+            </div>
+          </div>
+
+          <button
+            class="btn btn-primary w-100 mt-4 py-2"
+            onclick="addReturn()">
+            Submit Return
+          </button>
+        </div>
       </div>
     </section>
 
