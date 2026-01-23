@@ -24,6 +24,7 @@ const db = JSON.parse(localStorage.getItem("mbg")) || {
 function save() {
   localStorage.setItem("mbg", JSON.stringify(db));
   renderDashboard();
+  renderRecentActivity()
   renderReportTable(getAllTransactions());
 }
 
@@ -48,12 +49,12 @@ function addIncoming() {
 
 function addDistribution() {
   if (+outQty.value > stock()) return alert("Stock not enough");
-  db.distribution.push({ date: outDate.value, qty:+outQty.value, class:outClass.value, rep:outRep.value });
+  db.distribution.push({ date: outDate.value, qty:+outQty.value, class:outClass.value, rep:outRep.value, notes: outNotes.value });
   save();
 }
 
 function addReturn() {
-  db.returns.push({ date: retDate.value, qty:+retQty.value, class:retClass.value, rep:retRep.value });
+  db.returns.push({ date: retDate.value, qty:+retQty.value, class:retClass.value, rep:retRep.value, notes: retNotes.value });
   save();
 }
 
@@ -70,8 +71,61 @@ function renderDashboard() {
   document.getElementById("distStock").textContent = stock();
   document.getElementById("returnStock").textContent = stock();
 }
+function renderRecentActivity() {
+  const container = document.getElementById("recentActivity");
+  if (!container) return;
+
+  const activities = getAllTransactions().slice(0, 5); // ambil 5 terbaru
+  container.innerHTML = "";
+
+  if (activities.length === 0) {
+    container.innerHTML = `
+      <li class="list-group-item text-muted text-center">
+        No activity yet
+      </li>
+    `;
+    return;
+  }
+
+  activities.forEach(a => {
+    const icon =
+      a.type === "INCOMING" ? "bi-download text-success" :
+      a.type === "DISTRIBUTION" ? "bi-upload text-warning" :
+      "bi-arrow-counterclockwise text-purple";
+
+    const sign =
+      a.type === "DISTRIBUTION" ? "-" : "+";
+
+    container.innerHTML += `
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-3">
+          <i class="bi ${icon} fs-5"></i>
+          <div>
+            <div class="fw-semibold">
+              ${a.type === "INCOMING" ? "Received from Kitchen" :
+                a.type === "DISTRIBUTION" ? `Distributed to ${a.details}` :
+                `Returned from ${a.details}`}
+            </div>
+            <small class="text-muted">${a.date}</small>
+          </div>
+        </div>
+
+        <span class="fw-bold ${sign === "-" ? "text-danger" : "text-success"}">
+          ${sign}${a.qty}
+        </span>
+      </li>
+    `;
+  });
+}
+
 
 // REPORT
+function truncateText(text, max = 30) {
+  if (!text) return "";
+  return text.length > max
+    ? text.slice(0, max) + "..."
+    : text;
+}
 function renderReportTable(list) {
   reportTable.innerHTML = "";
 
@@ -87,7 +141,9 @@ function renderReportTable(list) {
         <td><span class="badge-type ${badge}">${d.type}</span></td>
         <td>
           <strong>${d.details}</strong><br>
-          <small class="text-muted">${d.note || ""}</small>
+          <small class="text-muted" title="${d.note || ""}">
+            ${truncateText(d.note, 40)}
+          </small>
         </td>
         <td>${d.rep || "-"}</td>
         <td class="fw-bold">${d.qty}</td>
@@ -98,7 +154,6 @@ function renderReportTable(list) {
     `;
   });
 }
-
 
 function getAllTransactions() {
   return [
@@ -158,6 +213,77 @@ function deleteTransaction(index) {
   save();
   applyReportFilter();
 }
+
+function truncateText(text, max = 50) {
+  if (!text) return "";
+  return text.length > max
+    ? text.slice(0, max) + "..."
+    : text;
+}
+
+function exportCSV() {
+  // Ambil data sesuai filter yang sedang aktif
+  let list = getAllTransactions();
+
+  if (filterType.value !== "ALL") {
+    list = list.filter(d => d.type === filterType.value);
+  }
+
+  if (filterFrom.value) {
+    list = list.filter(d => d.date >= filterFrom.value);
+  }
+
+  if (filterTo.value) {
+    list = list.filter(d => d.date <= filterTo.value);
+  }
+
+  if (list.length === 0) {
+    alert("No data to export");
+    return;
+  }
+
+  // Header CSV
+  const headers = [
+    "Date",
+    "Type",
+    "Details",
+    "Representative",
+    "Quantity",
+    "Notes"
+  ];
+
+  // Helper untuk escape CSV
+  const escapeCSV = value => {
+    if (value == null) return "";
+    return `"${String(value).replace(/"/g, '""')}"`;
+  };
+
+  // Gabungkan ke format CSV
+  const rows = list.map(d => [
+    d.date,
+    d.type,
+    d.details,
+    d.rep || "-",
+    d.qty,
+    d.note || ""
+  ].map(escapeCSV).join(","));
+
+  const csvContent =
+    headers.join(",") + "\n" +
+    rows.join("\n");
+
+  // Buat file & download
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `mbg-report-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
 
 
 

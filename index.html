@@ -2,11 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>MBG Journal</title>
+  <title>Jurnal MBG</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/svg" href="Jurnal-MBG-Logo.svg">
 
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -16,19 +18,38 @@
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="brand">
-      <div class="logo">M</div>
-      <div>
-        <h6>MBG Journal</h6>
-        <small>School System</small>
+      <div class="logo">MBG</div>
+      <div class="brand-text">
+        <h6>Jurnal MBG</h6>
+        <small>SMAN 2 BATU</small>
       </div>
     </div>
 
-    <nav>
-      <button class="active" onclick="showPage('dashboard', this)">Dashboard</button>
-      <button onclick="showPage('incoming', this)">Incoming</button>
-      <button onclick="showPage('distribution', this)">Distribution</button>
-      <button onclick="showPage('return', this)">Return</button>
-      <button onclick="showPage('reports', this)">Reports</button>
+    <nav class="sidebar-nav">
+      <button class="active" onclick="showPage('dashboard', this)">
+        <i class="bi bi-grid"></i>
+        Dashboard
+      </button>
+
+      <button onclick="showPage('incoming', this)">
+        <i class="bi bi-download"></i>
+        Incoming
+      </button>
+
+      <button onclick="showPage('distribution', this)">
+        <i class="bi bi-upload"></i>
+        Distribution
+      </button>
+
+      <button onclick="showPage('return', this)">
+        <i class="bi bi-arrow-counterclockwise"></i>
+        Return
+      </button>
+
+      <button onclick="showPage('reports', this)">
+        <i class="bi bi-clock-history"></i>
+        Reports
+      </button>
     </nav>
   </aside>
 
@@ -40,37 +61,63 @@
       <h2>Dashboard</h2>
       <p class="text-muted">Overview of MBG stock and recent activities.</p>
 
-      <div class="row g-3 mb-4">
+      <div class="row g-4 mb-4">
         <div class="col-md-3">
           <div class="stat-card blue">
-            <small>CURRENT STOCK</small>
+            <div class="stat-header">
+              <small>CURRENT STOCK</small>
+              <i class="bi bi-box-seam"></i>
+            </div>
             <h3 id="dStock">0</h3>
           </div>
         </div>
+
         <div class="col-md-3">
           <div class="stat-card green">
-            <small>TOTAL RECEIVED</small>
+            <div class="stat-header">
+              <small>TOTAL RECEIVED</small>
+              <i class="bi bi-download"></i>
+            </div>
             <h3 id="dIn">0</h3>
           </div>
         </div>
+
         <div class="col-md-3">
           <div class="stat-card yellow">
-            <small>TOTAL DISTRIBUTED</small>
+            <div class="stat-header">
+              <small>TOTAL DISTRIBUTED</small>
+              <i class="bi bi-upload"></i>
+            </div>
             <h3 id="dOut">0</h3>
           </div>
         </div>
+
         <div class="col-md-3">
           <div class="stat-card purple">
-            <small>TOTAL RETURNED</small>
+            <div class="stat-header">
+              <small>TOTAL RETURNED</small>
+              <i class="bi bi-arrow-counterclockwise"></i>
+            </div>
             <h3 id="dReturn">0</h3>
           </div>
         </div>
       </div>
 
-      <div class="card-box">
-        <h5>Recent Activity</h5>
-        <ul id="recentActivity" class="activity-list"></ul>
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between mb-3">
+          <h5 class="fw-bold mb-0">Recent Activity</h5>
+          <small class="text-primary cursor-pointer" onclick="showPage('reports', this)">
+            View All
+          </small>
+        </div>
+
+        <ul id="recentActivity" class="list-group list-group-flush">
+          <!-- activity items here -->
+        </ul>
       </div>
+    </div>
+
     </section>
 
     <!-- INCOMING -->
@@ -187,6 +234,7 @@
             <div class="col-12">
               <label class="form-label">Notes (Optional)</label>
               <textarea
+                id="outNotes"
                 class="form-control"
                 rows="4"
                 placeholder="Any additional details..."></textarea>
@@ -261,7 +309,7 @@
             <div class="col-12">
               <label class="form-label">Notes (Optional)</label>
               <textarea
-                id="retNote"
+                id="retNotes"
                 class="form-control"
                 rows="4"
                 placeholder="Any additional details..."></textarea>
@@ -284,53 +332,82 @@
       <p class="text-muted">View transaction history and generate reports.</p>
       <p class="text-muted">Overview of MBG stock and recent activities.</p>
 
-      <div class="row g-3 mb-4">
+      <div class="row g-4 mb-4">
         <div class="col-md-3">
           <div class="stat-card blue">
-            <small>CURRENT STOCK</small>
+            <div class="stat-header">
+              <small>CURRENT STOCK</small>
+              <i class="bi bi-box-seam"></i>
+            </div>
             <h3 id="dStockReport">0</h3>
           </div>
         </div>
+
         <div class="col-md-3">
           <div class="stat-card green">
-            <small>TOTAL RECEIVED</small>
+            <div class="stat-header">
+              <small>TOTAL RECEIVED</small>
+              <i class="bi bi-download"></i>
+            </div>
             <h3 id="dInReport">0</h3>
           </div>
         </div>
+
         <div class="col-md-3">
           <div class="stat-card yellow">
-            <small>TOTAL DISTRIBUTED</small>
+            <div class="stat-header">
+              <small>TOTAL DISTRIBUTED</small>
+              <i class="bi bi-upload"></i>
+            </div>
             <h3 id="dOutReport">0</h3>
           </div>
         </div>
+
         <div class="col-md-3">
           <div class="stat-card purple">
-            <small>TOTAL RETURNED</small>
+            <div class="stat-header">
+              <small>TOTAL RETURNED</small>
+              <i class="bi bi-arrow-counterclockwise"></i>
+            </div>
             <h3 id="dReturnReport">0</h3>
           </div>
         </div>
       </div>
+
       <!-- TRANSACTION HISTORY -->
       <div class="card-box">
 
         <div class="d-flex justify-content-between align-items-center mb-3">
-          <h5 class="mb-0">Transaction History</h5>
+          <h5 class="mb-0 fw-bold">Transaction History</h5>
 
-          <div class="d-flex gap-2">
-            <input type="date" id="filterFrom" class="form-control">
-            <input type="date" id="filterTo" class="form-control">
+          <div class="d-flex align-items-center gap-2 report-toolbar">
+            <input type="date" id="filterFrom" class="form-control report-input">
+            <p>_</p>
+            <input type="date" id="filterTo" class="form-control report-input">
 
-            <select id="filterType" class="form-select">
+            <select id="filterType" class="form-select report-input">
               <option value="ALL">All Types</option>
               <option value="INCOMING">Incoming</option>
               <option value="DISTRIBUTION">Distribution</option>
               <option value="RETURN">Return</option>
             </select>
 
-            <button class="btn btn-outline-primary" onclick="applyReportFilter()">Filter</button>
-            <button class="btn btn-outline-success" onclick="exportCSV()">Export CSV</button>
+            <button
+              class="btn btn-outline-primary icon-btn"
+              onclick="applyReportFilter()"
+              title="Filter">
+              <i class="bi bi-funnel"></i>
+            </button>
+
+            <button
+              class="btn btn-outline-success icon-btn"
+              onclick="exportCSV()">
+              <i class="bi bi-download"></i>
+              Export CSV
+            </button>
           </div>
         </div>
+
 
         <div class="table-responsive">
           <table class="table align-middle">
