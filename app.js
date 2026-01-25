@@ -53,14 +53,26 @@ function stock() {
 }
 
 function addIncoming() {
-  if (inQty.value <= 0) {
+  const qtyInput = Number(inQty.value);
+
+  if (qtyInput <= 0 || isNaN(qtyInput)) {
     showErrorToast("Quantity wajib diisi dan tidak boleh di bawah 1!");
     inQty.focus();
-    return
-  };
-  db.incoming.push({ date: inDate.value, qty:+inQty.value, notes: inNotes.value });
+    return;
+  }
+
+  const incomingQty =
+    incomingMode === "DATANG" ? qtyInput : -qtyInput;
+
+  db.incoming.push({
+    date: inDate.value,
+    qty: incomingQty,
+    notes: inNotes.value
+  });
+
   save();
 }
+
 
 function addDistribution() {
   if (outQty.value <= 0) {
@@ -93,8 +105,6 @@ function addReturn() {
     retQty.focus()
     return
   }
-  // if (!retClass.value) return alert("Class wajib diisi!");
-  // if (!retRep.value) return alert("Nama perwakilan wajib diisi!");
   if (!retClass.value) {
     showErrorToast("Class wajib diisi!");
     retClass.focus();
@@ -198,12 +208,15 @@ function renderRecentActivity() {
 
   activities.forEach(a => {
     const icon =
-      a.type === "INCOMING" ? "bi-download text-success" :
+      a.type === "INCOMING" ? "bi-box-seam text-success" :
+      a.type === "KEMBALI" ? "bi-box-seam text-danger" :
       a.type === "DISTRIBUTION" ? "bi-upload text-warning" :
       "bi-arrow-counterclockwise text-purple";
 
     const sign =
-      a.type === "DISTRIBUTION" ? "-" : "+";
+      a.type === "DISTRIBUTION" ? "-" :
+      a.type === "KEMBALI" ? "":
+      "+";
 
     container.innerHTML += `
       <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -212,6 +225,7 @@ function renderRecentActivity() {
           <div>
             <div class="fw-semibold">
               ${a.type === "INCOMING" ? "Received from Kitchen" :
+                a.type === "KEMBALI" ? "Back to Kitchen" :
                 a.type === "DISTRIBUTION" ? `Distributed to ${a.details}` :
                 `Returned from ${a.details}`}
             </div>
@@ -219,7 +233,9 @@ function renderRecentActivity() {
           </div>
         </div>
 
-        <span class="fw-bold ${sign === "-" ? "text-danger" : "text-success"}">
+        <span class="fw-bold ${sign === "-" ? "text-danger" : 
+          sign === "" ? "text-danger" :
+          "text-success"}">
           ${sign}${a.qty}
         </span>
       </li>
@@ -227,6 +243,29 @@ function renderRecentActivity() {
   });
 }
 
+// INCOMING
+let incomingMode = "DATANG"
+function setIncomingMode(mode) {
+  incomingMode = mode;
+
+  const btnDatang = document.getElementById("btnDatang");
+  const btnKembali = document.getElementById("btnKembali");
+  const submitBtn = document.getElementById("incomingSubmitBtn");
+
+  if (mode === "DATANG") {
+    btnDatang.classList.add("btn-primary", "active");
+    btnDatang.classList.remove("btn-outline-primary");
+    btnKembali.classList.add("btn-outline-primary");
+    btnKembali.classList.remove("btn-primary", "active");
+    submitBtn.textContent = "Submit Datang";
+  } else {
+    btnKembali.classList.add("btn-primary", "active");
+    btnKembali.classList.remove("btn-outline-primary");
+    btnDatang.classList.add("btn-outline-primary");
+    btnDatang.classList.remove("btn-primary", "active");
+    submitBtn.textContent = "Submit Kembali";
+  }
+}
 
 // REPORT
 function truncateText(text, max = 30) {
@@ -235,13 +274,19 @@ function truncateText(text, max = 30) {
     ? text.slice(0, max) + "..."
     : text;
 }
+
 function renderReportTable(list) {
   reportTable.innerHTML = "";
 
-  list.forEach((d, i) => {
+  const sortedList = [...list].sort(
+    (a, b) => b.date.localeCompare(a.date)
+  );
+
+  sortedList.forEach((d, i) => {
     const badge =
       d.type === "INCOMING" ? "badge-in" :
       d.type === "DISTRIBUTION" ? "badge-out" :
+      d.type === "KEMBALI" ? "badge-kembali" :
       "badge-return";
 
     reportTable.innerHTML += `
@@ -251,13 +296,17 @@ function renderReportTable(list) {
         <td>
           <strong>${d.details}</strong><br>
           <small class="text-muted" title="${d.note || ""}">
-            ${truncateText(d.note, 40)}
+            ${truncateText(d.note, 30)}
           </small>
         </td>
         <td>${d.rep || "-"}</td>
         <td class="fw-bold">${d.qty}</td>
         <td>
-          <button class="btn btn-danger btn-sm action-delete" onclick="deleteTransaction(${i})">🗑</button>
+          <button
+            class="btn btn-danger btn-sm action-delete"
+            onclick="openDeleteModal(${i})">
+            🗑
+          </button>
         </td>
       </tr>
     `;
@@ -267,7 +316,7 @@ function renderReportTable(list) {
 function getAllTransactions() {
   return [
     ...db.incoming.map(d => ({
-      type:"INCOMING", date:d.date, qty:d.qty,
+      type: d.qty > 0 ? "INCOMING" : "KEMBALI", date:d.date, qty:d.qty,
       details:"MBG Kitchen", note:d.notes
     })),
     ...db.distribution.map(d => ({
@@ -298,13 +347,25 @@ function applyReportFilter() {
   renderReportTable(list);
 }
 
-function deleteTransaction(index) {
-  if (!confirm("Delete this transaction?")) return;
+let deleteIndex = null;
 
+function openDeleteModal(index) {
+  deleteIndex = index;
+  new bootstrap.Modal(
+    document.getElementById("deleteColomModal")
+  ).show();
+}
+
+function deleteTransaction(index) {
   const all = getAllTransactions();
   const item = all[index];
 
   if (item.type === "INCOMING") {
+    db.incoming.splice(db.incoming.findIndex(d =>
+      d.date === item.date && d.qty === item.qty), 1);
+  }
+
+  if (item.type === "KEMBALI") {
     db.incoming.splice(db.incoming.findIndex(d =>
       d.date === item.date && d.qty === item.qty), 1);
   }
@@ -323,11 +384,16 @@ function deleteTransaction(index) {
   applyReportFilter();
 }
 
-function truncateText(text, max = 50) {
-  if (!text) return "";
-  return text.length > max
-    ? text.slice(0, max) + "..."
-    : text;
+function confirmDelete() {
+  if (deleteIndex === null) return;
+
+  deleteTransaction(deleteIndex);
+  deleteIndex = null;
+
+  const modal = bootstrap.Modal.getInstance(
+    document.getElementById("deleteColomModal")
+  );
+  modal.hide();
 }
 
 // Export CSV
@@ -400,8 +466,6 @@ function clearDB(){
   location.reload()
 }
 
-
-
-
 renderDashboard();
+renderRecentActivity()
 renderReportTable(getAllTransactions());
