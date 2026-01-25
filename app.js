@@ -6,6 +6,17 @@ const dStockReport = document.getElementById('dStockReport');
 const dInReport = document.getElementById('dInReport');
 const dOutReport = document.getElementById('dOutReport');
 const dReturnReport = document.getElementById('dReturnReport');
+
+const inQty = document.getElementById('inQty')
+const outQty = document.getElementById('outQty')
+const retQty = document.getElementById('retQty')
+const outLevelSelect = document.getElementById("outLevelSelect");
+const outClassSelect = document.getElementById("outClass");
+const retLevelSelect = document.getElementById("retLevelSelect");
+const retClassSelect = document.getElementById("retClass");
+const outRep = document.getElementById("outRep");
+const retRep = document.getElementById("retRep");
+
 const today = new Date().toISOString().split("T")[0];
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -13,7 +24,6 @@ document.addEventListener("DOMContentLoaded", () => {
     i.value = today;
   });
 });
-
 
 const db = JSON.parse(localStorage.getItem("mbg")) || {
   incoming: [],
@@ -43,20 +53,118 @@ function stock() {
 }
 
 function addIncoming() {
+  if (inQty.value <= 0) {
+    showErrorToast("Quantity wajib diisi dan tidak boleh di bawah 1!");
+    inQty.focus();
+    return
+  };
   db.incoming.push({ date: inDate.value, qty:+inQty.value, notes: inNotes.value });
   save();
 }
 
 function addDistribution() {
-  if (+outQty.value > stock()) return alert("Stock not enough");
+  if (outQty.value <= 0) {
+    showErrorToast("Quantity wajib diisi dan tidak boleh di bawah 1!");
+    outQty.focus();
+    return
+  };
+  if (!outClass.value) {
+    showErrorToast("Class wajib diisi!");
+    outClass.focus();
+    return
+  };
+  if (!outRep.value) {
+    showErrorToast("Nama perwakilan wajib diisi!");
+    outRep.focus();
+    return
+  };
+  if (+outQty.value > stock()) {
+    showErrorToast("Stok MBG tidak cukup!")
+    outQty.focus()
+    return
+  };
   db.distribution.push({ date: outDate.value, qty:+outQty.value, class:outClass.value, rep:outRep.value, notes: outNotes.value });
   save();
 }
 
 function addReturn() {
+  if (retQty.value <= 0) {
+    showErrorToast("Quantity wajib diisi dan tidak boleh di bawah 1!")
+    retQty.focus()
+    return
+  }
+  // if (!retClass.value) return alert("Class wajib diisi!");
+  // if (!retRep.value) return alert("Nama perwakilan wajib diisi!");
+  if (!retClass.value) {
+    showErrorToast("Class wajib diisi!");
+    retClass.focus();
+    return
+  };
+  if (!retRep.value) {
+    showErrorToast("Nama perwakilan wajib diisi!");
+    retRep.focus();
+    return
+  };
   db.returns.push({ date: retDate.value, qty:+retQty.value, class:retClass.value, rep:retRep.value, notes: retNotes.value });
   save();
 }
+
+// TOAST
+function showErrorToast(message) {
+  const toastEl = document.getElementById("errorToast");
+  document.getElementById("errorToastMsg").innerText = message;
+  const toast = new bootstrap.Toast(toastEl, {
+    delay: 3000
+  });
+
+  toast.show();
+}
+
+
+// INPUT CLASS
+const classData = {
+  10: ["10-1", "10-2", "10-3", "10-4", "10-5","10-6", "10-7", "10-8", "10-9", "10-10"],
+  11: ["11-1", "11-2", "11-3", "11-4", "11-5","11-6", "11-7", "11-8", "11-9", "11-10"],
+  12: ["12-1", "12-2", "12-3", "12-4", "12-5","12-6", "12-7", "12-8", "12-9", "12-10"]
+};
+
+outLevelSelect.addEventListener("change", () => {
+  const outLevel = outLevelSelect.value;
+
+  outClassSelect.innerHTML = `<option value="">--Pilih Kelas--</option>`;
+  outClassSelect.disabled = true;
+
+  if (!outLevel || !classData[outLevel]) return;
+
+  classData[outLevel].forEach(cls => {
+    const opt = document.createElement("option");
+    opt.value = cls;
+    opt.textContent = cls;
+    outClassSelect.appendChild(opt);
+  });
+
+  outClassSelect.disabled = false;
+});
+
+retLevelSelect.addEventListener("change", () => {
+  const retLevel = retLevelSelect.value;
+
+  retClassSelect.innerHTML = `<option value="">--Pilih Kelas--</option>`;
+  retClassSelect.disabled = true;
+
+  if (!retLevel || !classData[retLevel]) return;
+
+  classData[retLevel].forEach(cls => {
+    const opt = document.createElement("option");
+    opt.value = cls;
+    opt.textContent = cls;
+    retClassSelect.appendChild(opt);
+  });
+
+  retClassSelect.disabled = false;
+});
+
+// DASHBOARD
 
 function renderDashboard() {
   dStock.textContent = stock();
@@ -71,6 +179,7 @@ function renderDashboard() {
   document.getElementById("distStock").textContent = stock();
   document.getElementById("returnStock").textContent = stock();
 }
+
 function renderRecentActivity() {
   const container = document.getElementById("recentActivity");
   if (!container) return;
@@ -148,7 +257,7 @@ function renderReportTable(list) {
         <td>${d.rep || "-"}</td>
         <td class="fw-bold">${d.qty}</td>
         <td>
-          <span class="action-delete" onclick="deleteTransaction(${i})">🗑</span>
+          <button class="btn btn-danger btn-sm action-delete" onclick="deleteTransaction(${i})">🗑</button>
         </td>
       </tr>
     `;
@@ -221,6 +330,8 @@ function truncateText(text, max = 50) {
     : text;
 }
 
+// Export CSV
+
 function exportCSV() {
   // Ambil data sesuai filter yang sedang aktif
   let list = getAllTransactions();
@@ -282,6 +393,11 @@ function exportCSV() {
   a.click();
 
   URL.revokeObjectURL(url);
+}
+
+function clearDB(){
+  localStorage.clear()
+  location.reload()
 }
 
 
