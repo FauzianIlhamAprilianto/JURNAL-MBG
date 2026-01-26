@@ -41,7 +41,6 @@ function save() {
 function showPage(id, btn) {
   document.querySelectorAll("main section").forEach(s => s.classList.add("d-none"));
   document.getElementById(id).classList.remove("d-none");
-
   document.querySelectorAll(".sidebar nav button").forEach(b => b.classList.remove("active"));
   btn.classList.add("active");
 }
@@ -67,10 +66,15 @@ function addIncoming() {
   db.incoming.push({
     date: inDate.value,
     qty: incomingQty,
+    rep: inRep.value,
     notes: inNotes.value
   });
 
   save();
+  showSuccessToast("Data berhasil disimpan ✅");
+  document.getElementById("inNotes").value = "";
+  document.getElementById("inQty").value = "";
+  document.getElementById("inMBG").value = "MBG Kitchen";
 }
 
 
@@ -87,7 +91,7 @@ function addDistribution() {
   };
   if (!outRep.value) {
     showErrorToast("Nama perwakilan wajib diisi!");
-    outRep.focus();
+    outRep.focus()
     return
   };
   if (+outQty.value > stock()) {
@@ -97,6 +101,13 @@ function addDistribution() {
   };
   db.distribution.push({ date: outDate.value, qty:+outQty.value, class:outClass.value, rep:outRep.value, notes: outNotes.value });
   save();
+  showSuccessToast("Data berhasil disimpan ✅");
+  document.getElementById("outQty").value = "";
+  document.getElementById("outLevelSelect").value = "--Pilih Kelas--";
+  document.getElementById("outRep").value = "";
+  document.getElementById("outNotes").value = "";
+  document.getElementById("outClass").disabled = true;
+  document.getElementById("outClass").value = "";
 }
 
 function addReturn() {
@@ -117,6 +128,13 @@ function addReturn() {
   };
   db.returns.push({ date: retDate.value, qty:+retQty.value, class:retClass.value, rep:retRep.value, notes: retNotes.value });
   save();
+  showSuccessToast("Data berhasil disimpan ✅");
+  document.getElementById("retQty").value = "";
+  document.getElementById("retLevelSelect").value = "--Pilih Kelas--";
+  document.getElementById("retRep").value = "";
+  document.getElementById("retNotes").value = "";
+  document.getElementById("retClass").disabled = true;
+  document.getElementById("retClass").value = "";
 }
 
 // TOAST
@@ -129,6 +147,18 @@ function showErrorToast(message) {
 
   toast.show();
 }
+
+function showSuccessToast(message) {
+  const toastEl = document.getElementById("successToast");
+  document.getElementById("successToastMsg").innerText = message;
+
+  const toast = new bootstrap.Toast(toastEl, {
+    delay: 3000
+  });
+
+  toast.show();
+}
+
 
 
 // INPUT CLASS
@@ -187,7 +217,7 @@ function renderDashboard() {
   dReturnReport.textContent = db.returns.reduce((a,b)=>a+b.qty,0);
   document.getElementById("incomingStock").textContent = stock();
   document.getElementById("distStock").textContent = stock();
-  document.getElementById("returnStock").textContent = stock();
+  document.getElementById("returnStock").textContent = db.returns.reduce((a,b)=>a+b.qty,0);
 }
 
 function renderRecentActivity() {
@@ -258,12 +288,15 @@ function setIncomingMode(mode) {
     btnKembali.classList.add("btn-outline-primary");
     btnKembali.classList.remove("btn-primary", "active");
     submitBtn.textContent = "Submit Datang";
+    document.getElementById("inDate").disabled = false;
   } else {
     btnKembali.classList.add("btn-primary", "active");
     btnKembali.classList.remove("btn-outline-primary");
     btnDatang.classList.add("btn-outline-primary");
     btnDatang.classList.remove("btn-primary", "active");
     submitBtn.textContent = "Submit Kembali";
+    document.getElementById("inDate").disabled = true;
+    document.getElementById("inDate").value = today;
   }
 }
 
@@ -317,7 +350,7 @@ function getAllTransactions() {
   return [
     ...db.incoming.map(d => ({
       type: d.qty > 0 ? "INCOMING" : "KEMBALI", date:d.date, qty:d.qty,
-      details:"MBG Kitchen", note:d.notes
+      details:"MBG Kitchen", rep:d.rep ,note:d.notes
     })),
     ...db.distribution.map(d => ({
       type:"DISTRIBUTION", date:d.date, qty:d.qty,
