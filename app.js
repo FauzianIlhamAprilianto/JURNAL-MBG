@@ -45,10 +45,11 @@ function showPage(id, btn) {
   btn.classList.add("active");
 }
 
+
 function stock() {
-  return db.incoming.reduce((a,b)=>a+b.qty,0)
-       - db.distribution.reduce((a,b)=>a+b.qty,0)
-       + db.returns.reduce((a,b)=>a+b.qty,0);
+  // return db.incoming.filter(item => item.date === today).reduce((a,b)=>a+b.qty,0)
+  //      - db.distribution.filter(item => item.date === today).reduce((a,b)=>a+b.qty,0)
+  return Math.max(db.incoming.filter(d => d.date === today).reduce((a,b)=>a+b.qty,0) - db.distribution.filter(d => d.date === today).reduce((a,b)=>a+b.qty,0), 0);
 }
 
 function addIncoming() {
@@ -204,19 +205,79 @@ retLevelSelect.addEventListener("change", () => {
   retClassSelect.disabled = false;
 });
 
+// COUNTER ON HOVER
+
+const boxIn = document.getElementById("dBoxIn");
+boxIn.addEventListener("mouseenter", () => {
+  document.getElementById('labelIn').textContent = "TOTAL RECEIVED";
+  dIn.textContent = db.incoming.filter(item => item.date === today && item.qty > 0).reduce((a,b)=>a+b.qty,0);
+});
+boxIn.addEventListener("mouseleave", () => {
+  document.getElementById('labelIn').textContent = "TODAY RECEIVED";
+  dIn.textContent = db.incoming.filter(item => item.date === today && item.qty > 0).reduce((a,b)=>a+b.qty,0);
+});
+const boxInReport = document.getElementById("dBoxInReport");
+boxInReport.addEventListener("mouseenter", () => {
+  document.getElementById('labelInReport').textContent = "TOTAL RECEIVED";
+  dInkReport.textContent = db.incoming.filter(item => item.date === today && item.qty > 0).reduce((a,b)=>a+b.qty,0);
+});
+boxInReport.addEventListener("mouseleave", () => {
+  document.getElementById('labelInReport').textContent = "TODAY RECEIVED";
+  dInkReport.textContent = db.incoming.filter(item => item.date === today && item.qty > 0).reduce((a,b)=>a+b.qty,0);
+});
+
+const boxOut = document.getElementById("dBoxOut");
+boxOut.addEventListener("mouseenter", () => {
+  document.getElementById('labelOut').textContent = "TOTAL DISTRIBUTED";
+  dOut.textContent = db.distribution.reduce((a,b)=>a+b.qty,0);
+});
+boxOut.addEventListener("mouseleave", () => {
+  document.getElementById('labelOut').textContent = "TODAY DISTRIBUTED";
+  dOut.textContent = db.distribution.filter(item => item.date === today).reduce((a,b)=>a+b.qty,0);
+});
+const boxOutReport = document.getElementById("dBoxOutReport");
+boxOutReport.addEventListener("mouseenter", () => {
+  document.getElementById('labelOutReport').textContent = "TOTAL DISTRIBUTED";
+  dOutReport.textContent = db.distribution.reduce((a,b)=>a+b.qty,0);
+});
+boxOutReport.addEventListener("mouseleave", () => {
+  document.getElementById('labelOutReport').textContent = "TODAY DISTRIBUTED";
+  dOutReport.textContent = db.distribution.filter(item => item.date === today).reduce((a,b)=>a+b.qty,0);
+});
+
+const boxReturn = document.getElementById("dBoxReturn");
+boxReturn.addEventListener("mouseenter", () => {
+  document.getElementById('labelReturn').textContent = "TOTAL RETURNED";
+  dReturn.textContent =  db.returns.reduce((a,b)=>a+b.qty,0);
+});
+boxReturn.addEventListener("mouseleave", () => {
+  document.getElementById('labelReturn').textContent = "TODAY RETURNED";
+  dReturn.textContent = db.returns.filter(item => item.date === today).reduce((a,b)=>a+b.qty,0);
+});
+const boxReturnReport = document.getElementById("dBoxReturnReport");
+boxReturnReport.addEventListener("mouseenter", () => {
+  document.getElementById('labelReturnReport').textContent = "TOTAL RETURNED";
+  dReturnReport.textContent =  db.returns.reduce((a,b)=>a+b.qty,0);
+});
+boxReturnReport.addEventListener("mouseleave", () => {
+  document.getElementById('labelReturnReport').textContent = "TODAY RETURNED";
+  dReturnReport.textContent = db.returns.filter(item => item.date === today).reduce((a,b)=>a+b.qty,0);
+});
+
 // DASHBOARD
 
 function renderDashboard() {
   dStock.textContent = stock();
-  dIn.textContent = db.incoming.reduce((a,b)=>a+b.qty,0);
-  dOut.textContent = db.distribution.reduce((a,b)=>a+b.qty,0);
-  dReturn.textContent = db.returns.reduce((a,b)=>a+b.qty,0);
+  dIn.textContent = db.incoming.filter(item => item.date === today && item.qty > 0).reduce((a,b)=>a+b.qty,0);
+  dOut.textContent = db.distribution.filter(item => item.date === today && item.qty > 0).reduce((a,b)=>a+b.qty,0);
+  dReturn.textContent = db.returns.filter(item => item.date === today && item.qty > 0).reduce((a,b)=>a+b.qty,0);
   dStockReport.textContent = stock();
-  dInReport.textContent = db.incoming.reduce((a,b)=>a+b.qty,0);
-  dOutReport.textContent = db.distribution.reduce((a,b)=>a+b.qty,0);
-  dReturnReport.textContent = db.returns.reduce((a,b)=>a+b.qty,0);
+  dInReport.textContent = db.incoming.filter(item => item.date === today && item.qty > 0).reduce((a,b)=>a+b.qty,0);
+  dOutReport.textContent = db.distribution.filter(item => item.date === today && item.qty > 0).reduce((a,b)=>a+b.qty,0);
+  dReturnReport.textContent = db.returns.filter(item => item.date === today && item.qty > 0).reduce((a,b)=>a+b.qty,0);
   document.getElementById("incomingStock").textContent = stock();
   document.getElementById("distStock").textContent = stock();
+  document.getElementById("distTotal").textContent = db.distribution.filter(item => item.date === today && item.qty > 0).reduce((a,b)=>a+b.qty,0);
   document.getElementById("returnStock").textContent = db.returns.reduce((a,b)=>a+b.qty,0);
 }
 

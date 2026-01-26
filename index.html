@@ -72,30 +72,30 @@
           </div>
         </div>
 
-        <div class="col-md-3">
+        <div id="dBoxIn" class="col-md-3">
           <div class="stat-card green">
             <div class="stat-header">
-              <small>TOTAL RECEIVED</small>
+              <small id="labelIn">TODAY RECEIVED</small>
               <i class="bi bi-download"></i>
             </div>
             <h3 id="dIn">0</h3>
           </div>
         </div>
 
-        <div class="col-md-3">
+        <div id="dBoxOut" class="col-md-3">
           <div class="stat-card yellow">
             <div class="stat-header">
-              <small>TOTAL DISTRIBUTED</small>
+              <small id="labelOut">TODAY DISTRIBUTED</small>
               <i class="bi bi-upload"></i>
             </div>
             <h3 id="dOut">0</h3>
           </div>
         </div>
 
-        <div class="col-md-3">
+        <div id="dBoxReturn" class="col-md-3">
           <div class="stat-card purple">
             <div class="stat-header">
-              <small>TOTAL RETURNED</small>
+              <small id="labelReturn">TODAY RETURNED</small>
               <i class="bi bi-arrow-counterclockwise"></i>
             </div>
             <h3 id="dReturn">0</h3>
@@ -216,11 +216,19 @@
           <p class="text-muted mb-0">Distribute MBG stock to classes.</p>
         </div>
 
-        <div class="badge-stock">
-          <i class="bi bi-box-arrow-up"></i>
-          Available to Distribute:
-          <span id="distStock">0</span>
+        <div class="d-flex gap-3 flex-wrap">
+          <div class="badge-stock">
+            <i class="bi bi-box-seam"></i>
+            Available to Distribute:
+            <span id="distStock">0</span>
+          </div>
+          <div class="badge-stock">
+            <i class="bi bi-box-arrow-up"></i>
+            Today Distributed:
+            <span id="distTotal">0</span>
+          </div>
         </div>
+
       </div>
 
       <!-- Card -->
@@ -382,35 +390,35 @@
             <div class="stat-header">
               <small>CURRENT STOCK</small>
               <i class="bi bi-box-seam"></i>
-            </div>
+            </div>  
             <h3 id="dStockReport">0</h3>
           </div>
         </div>
 
-        <div class="col-md-3">
+        <div id="dBoxInReport" class="col-md-3">
           <div class="stat-card green">
             <div class="stat-header">
-              <small>TOTAL RECEIVED</small>
+              <small id="labelInReport">TODAY RECEIVED</small>
               <i class="bi bi-download"></i>
             </div>
             <h3 id="dInReport">0</h3>
           </div>
         </div>
 
-        <div class="col-md-3">
+        <div id="dBoxOutReport" class="col-md-3">
           <div class="stat-card yellow">
             <div class="stat-header">
-              <small>TOTAL DISTRIBUTED</small>
+              <small id="labelOutReport">TODAY DISTRIBUTED</small>
               <i class="bi bi-upload"></i>
             </div>
             <h3 id="dOutReport">0</h3>
           </div>
         </div>
 
-        <div class="col-md-3">
+        <div id="dBoxReturnReport" class="col-md-3">
           <div class="stat-card purple">
             <div class="stat-header">
-              <small>TOTAL RETURNED</small>
+              <small id="labelReturnReport">TODAY RETURNED</small>
               <i class="bi bi-arrow-counterclockwise"></i>
             </div>
             <h3 id="dReturnReport">0</h3>
