@@ -440,6 +440,7 @@
             <select id="filterType" class="form-select report-input">
               <option value="ALL">All Types</option>
               <option value="INCOMING">Incoming</option>
+              <option value="KEMBALI">Kembali</option>
               <option value="DISTRIBUTION">Distribution</option>
               <option value="RETURN">Return</option>
             </select>
@@ -449,13 +450,6 @@
               onclick="applyReportFilter()"
               title="Filter">
               <i class="bi bi-funnel"></i>
-            </button>
-
-            <button
-              class="btn btn-outline-success icon-btn"
-              onclick="exportCSV()">
-              <i class="bi bi-download"></i>
-              Export CSV
             </button>
 
             <button class="btn btn-outline-danger action-delete" data-bs-toggle="modal" data-bs-target="#deleteModal">🗑</button>
@@ -593,6 +587,7 @@
           </button>
 
           <button
+            id="hapusRow"
             type="button"
             class="btn btn-danger-soft w-100"
             onclick="confirmDelete()">
