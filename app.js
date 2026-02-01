@@ -1,3 +1,5 @@
+const API_URL = "https://script.google.com/macros/s/AKfycbxMJXbz4qtEi36fIpZFu0bY062cr6S2Wo70IYm86LEOznaQOiF_fNgRF2KsGU8VInHWrg/exec";
+
 const dStock = document.getElementById('dStock');
 const dIn = document.getElementById('dIn');
 const dOut = document.getElementById('dOut');
@@ -25,17 +27,32 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-const db = JSON.parse(localStorage.getItem("mbg")) || {
-  incoming: [],
-  distribution: [],
-  returns: []
-};
+// DATABASE SPREADSHEET
+let db = {};
 
-function save() {
-  localStorage.setItem("mbg", JSON.stringify(db));
-  renderDashboard();
-  renderRecentActivity()
-  renderReportTable(getAllTransactions());
+async function loadDB() {
+  try {
+    const res = await fetch(API_URL);
+    db = await res.json();
+    console.log(db);
+    renderDashboard();
+    renderRecentActivity();
+    renderReportTable(getAllTransactions());
+  } catch (err) {
+    console.error("Gagal load DB:", err);
+  }
+}
+
+async function sendData(data) {
+  await fetch(API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "text/plain"
+    },
+    body: JSON.stringify(data)
+  });
+
+  setTimeout(loadDB, 1000);
 }
 
 function showPage(id, btn) {
@@ -45,14 +62,25 @@ function showPage(id, btn) {
   btn.classList.add("active");
 }
 
-
 function stock() {
-  // return db.incoming.filter(item => item.date === today).reduce((a,b)=>a+b.qty,0)
-  //      - db.distribution.filter(item => item.date === today).reduce((a,b)=>a+b.qty,0)
-  return Math.max(db.incoming.filter(d => d.date === today).reduce((a,b)=>a+b.qty,0) - db.distribution.filter(d => d.date === today).reduce((a,b)=>a+b.qty,0), 0);
+  const todayData = db.filter(d => d.date === today);
+
+  const incoming = todayData
+    .filter(d => d.type === "INCOMING")
+    .reduce((a,b)=>a+b.qty,0);
+
+  const distribution = todayData
+    .filter(d => d.type === "DISTRIBUTION")
+    .reduce((a,b)=>a+b.qty,0);
+
+  const returns = todayData
+    .filter(d => d.type === "KEMBALI")
+    .reduce((a,b)=>a+b.qty,0);
+
+  return Math.max(incoming + returns - distribution, 0);
 }
 
-function addIncoming() {
+async function addIncoming() {
   const qtyInput = Number(inQty.value);
 
   if (qtyInput <= 0 || isNaN(qtyInput)) {
@@ -61,25 +89,24 @@ function addIncoming() {
     return;
   }
 
-  const incomingQty =
-    incomingMode === "DATANG" ? qtyInput : -qtyInput;
-
-  db.incoming.push({
+  await sendData({
+    type: "INCOMING",
     date: inDate.value,
-    qty: incomingQty,
+    qty: incomingMode === "DATANG" ? +inQty.value : -inQty.value,
+    details: inMBG.value,
     rep: inRep.value,
     notes: inNotes.value
   });
 
-  save();
   showSuccessToast("Data berhasil disimpan ✅");
   document.getElementById("inNotes").value = "";
+  document.getElementById("inRep").value = "";
   document.getElementById("inQty").value = "";
   document.getElementById("inMBG").value = "MBG Kitchen";
 }
 
 
-function addDistribution() {
+async function addDistribution() {
   if (outQty.value <= 0) {
     showErrorToast("Quantity wajib diisi dan tidak boleh di bawah 1!");
     outQty.focus();
@@ -100,8 +127,14 @@ function addDistribution() {
     outQty.focus()
     return
   };
-  db.distribution.push({ date: outDate.value, qty:+outQty.value, class:outClass.value, rep:outRep.value, notes: outNotes.value });
-  save();
+  await sendData({
+    type: "DISTRIBUTION",
+    date: outDate.value,
+    qty: +outQty.value,
+    details: outClass.value,
+    rep: outRep.value,
+    notes: outNotes.value
+  });
   showSuccessToast("Data berhasil disimpan ✅");
   document.getElementById("outQty").value = "";
   document.getElementById("outLevelSelect").value = "--Pilih Kelas--";
@@ -111,7 +144,7 @@ function addDistribution() {
   document.getElementById("outClass").value = "";
 }
 
-function addReturn() {
+async function addReturn() {
   if (retQty.value <= 0) {
     showErrorToast("Quantity wajib diisi dan tidak boleh di bawah 1!")
     retQty.focus()
@@ -127,8 +160,14 @@ function addReturn() {
     retRep.focus();
     return
   };
-  db.returns.push({ date: retDate.value, qty:+retQty.value, class:retClass.value, rep:retRep.value, notes: retNotes.value });
-  save();
+  await sendData({
+    type: "RETURN",
+    date: retDate.value,
+    qty: +retQty.value,
+    details: retClass.value,
+    rep: retRep.value,
+    notes: retNotes.value
+  });
   showSuccessToast("Data berhasil disimpan ✅");
   document.getElementById("retQty").value = "";
   document.getElementById("retLevelSelect").value = "--Pilih Kelas--";
@@ -166,7 +205,9 @@ function showSuccessToast(message) {
 const classData = {
   10: ["10-1", "10-2", "10-3", "10-4", "10-5","10-6", "10-7", "10-8", "10-9", "10-10"],
   11: ["11-1", "11-2", "11-3", "11-4", "11-5","11-6", "11-7", "11-8", "11-9", "11-10"],
-  12: ["12-1", "12-2", "12-3", "12-4", "12-5","12-6", "12-7", "12-8", "12-9", "12-10"]
+  12: ["12-1", "12-2", "12-3", "12-4", "12-5","12-6", "12-7", "12-8", "12-9", "12-10"],
+  13: [],
+  14: []
 };
 
 outLevelSelect.addEventListener("change", () => {
@@ -207,85 +248,107 @@ retLevelSelect.addEventListener("change", () => {
 
 // COUNTER ON HOVER
 
+// INCOMING COUNTER
 const boxIn = document.getElementById("dBoxIn");
 boxIn.addEventListener("mouseenter", () => {
   document.getElementById('labelIn').textContent = "TOTAL RECEIVED";
-  dIn.textContent = db.incoming.filter(item => item.date === today && item.qty > 0).reduce((a,b)=>a+b.qty,0);
+  dIn.textContent = db.filter(item => item.qty > 0 && item.type === "INCOMING").reduce((a,b)=>a+b.qty,0);
 });
 boxIn.addEventListener("mouseleave", () => {
   document.getElementById('labelIn').textContent = "TODAY RECEIVED";
-  dIn.textContent = db.incoming.filter(item => item.date === today && item.qty > 0).reduce((a,b)=>a+b.qty,0);
+  dIn.textContent = db.filter(item => item.date === today && item.qty > 0 && item.type === "INCOMING").reduce((a,b)=>a+b.qty,0);
 });
 const boxInReport = document.getElementById("dBoxInReport");
 boxInReport.addEventListener("mouseenter", () => {
   document.getElementById('labelInReport').textContent = "TOTAL RECEIVED";
-  dInkReport.textContent = db.incoming.filter(item => item.date === today && item.qty > 0).reduce((a,b)=>a+b.qty,0);
+  dInReport.textContent = db.filter(item => item.qty > 0 && item.type === "INCOMING").reduce((a,b)=>a+b.qty,0);
 });
 boxInReport.addEventListener("mouseleave", () => {
   document.getElementById('labelInReport').textContent = "TODAY RECEIVED";
-  dInkReport.textContent = db.incoming.filter(item => item.date === today && item.qty > 0).reduce((a,b)=>a+b.qty,0);
+  dInReport.textContent = db.filter(item => item.date === today && item.qty > 0 && item.type === "INCOMING").reduce((a,b)=>a+b.qty,0);
 });
 
+// DISTRIBUTED COUNTER
 const boxOut = document.getElementById("dBoxOut");
 boxOut.addEventListener("mouseenter", () => {
   document.getElementById('labelOut').textContent = "TOTAL DISTRIBUTED";
-  dOut.textContent = db.distribution.reduce((a,b)=>a+b.qty,0);
+  dOut.textContent = db.filter(d => d.type === "DISTRIBUTION").reduce((a,b)=>a+b.qty,0);
 });
 boxOut.addEventListener("mouseleave", () => {
   document.getElementById('labelOut').textContent = "TODAY DISTRIBUTED";
-  dOut.textContent = db.distribution.filter(item => item.date === today).reduce((a,b)=>a+b.qty,0);
+  dOut.textContent = db.filter(d => d.date === today && d.type === "DISTRIBUTION").reduce((a,b)=>a+b.qty,0);
 });
 const boxOutReport = document.getElementById("dBoxOutReport");
 boxOutReport.addEventListener("mouseenter", () => {
   document.getElementById('labelOutReport').textContent = "TOTAL DISTRIBUTED";
-  dOutReport.textContent = db.distribution.reduce((a,b)=>a+b.qty,0);
+  dOutReport.textContent = db.filter(d => d.type === "DISTRIBUTION").reduce((a,b)=>a+b.qty,0);
 });
 boxOutReport.addEventListener("mouseleave", () => {
   document.getElementById('labelOutReport').textContent = "TODAY DISTRIBUTED";
-  dOutReport.textContent = db.distribution.filter(item => item.date === today).reduce((a,b)=>a+b.qty,0);
+  dOutReport.textContent = db.filter(d => d.date === today && d.type === "DISTRIBUTION").reduce((a,b)=>a+b.qty,0);
 });
 
+// RETURNED COUNTER
 const boxReturn = document.getElementById("dBoxReturn");
 boxReturn.addEventListener("mouseenter", () => {
   document.getElementById('labelReturn').textContent = "TOTAL RETURNED";
-  dReturn.textContent =  db.returns.reduce((a,b)=>a+b.qty,0);
+  dReturn.textContent =  db.filter(d => d.type === "RETURN").reduce((a,b)=>a+b.qty,0);
 });
 boxReturn.addEventListener("mouseleave", () => {
   document.getElementById('labelReturn').textContent = "TODAY RETURNED";
-  dReturn.textContent = db.returns.filter(item => item.date === today).reduce((a,b)=>a+b.qty,0);
+  dReturn.textContent = db.filter(d => d.date === today && d.type === "RETURN").reduce((a,b)=>a+b.qty,0);
 });
 const boxReturnReport = document.getElementById("dBoxReturnReport");
 boxReturnReport.addEventListener("mouseenter", () => {
   document.getElementById('labelReturnReport').textContent = "TOTAL RETURNED";
-  dReturnReport.textContent =  db.returns.reduce((a,b)=>a+b.qty,0);
+  dReturnReport.textContent =  db.filter(d => d.type === "RETURN").reduce((a,b)=>a+b.qty,0);
 });
 boxReturnReport.addEventListener("mouseleave", () => {
   document.getElementById('labelReturnReport').textContent = "TODAY RETURNED";
-  dReturnReport.textContent = db.returns.filter(item => item.date === today).reduce((a,b)=>a+b.qty,0);
+  dReturnReport.textContent = db.filter(d => d.date === today && d.type === "RETURN").reduce((a,b)=>a+b.qty,0);
 });
 
 // DASHBOARD
 
 function renderDashboard() {
-  dStock.textContent = stock();
-  dIn.textContent = db.incoming.filter(item => item.date === today && item.qty > 0).reduce((a,b)=>a+b.qty,0);
-  dOut.textContent = db.distribution.filter(item => item.date === today && item.qty > 0).reduce((a,b)=>a+b.qty,0);
-  dReturn.textContent = db.returns.filter(item => item.date === today && item.qty > 0).reduce((a,b)=>a+b.qty,0);
-  dStockReport.textContent = stock();
-  dInReport.textContent = db.incoming.filter(item => item.date === today && item.qty > 0).reduce((a,b)=>a+b.qty,0);
-  dOutReport.textContent = db.distribution.filter(item => item.date === today && item.qty > 0).reduce((a,b)=>a+b.qty,0);
-  dReturnReport.textContent = db.returns.filter(item => item.date === today && item.qty > 0).reduce((a,b)=>a+b.qty,0);
-  document.getElementById("incomingStock").textContent = stock();
-  document.getElementById("distStock").textContent = stock();
-  document.getElementById("distTotal").textContent = db.distribution.filter(item => item.date === today && item.qty > 0).reduce((a,b)=>a+b.qty,0);
-  document.getElementById("returnStock").textContent = db.returns.reduce((a,b)=>a+b.qty,0);
+  const tData = db.filter(d => d.date === today);
+
+  let incoming = 0, kembali = 0, distribution = 0, returns = 0;
+
+  tData.forEach(d => {
+    if (d.type === "INCOMING") incoming += d.qty;
+    else if (d.type === "KEMBALI") kembali += d.qty;
+    else if (d.type === "DISTRIBUTION") distribution += d.qty;
+    else if (d.type === "RETURN") returns += d.qty;
+  });
+
+  const currentStock = Math.max(incoming + kembali - distribution, 0);
+
+  // ===== DASHBOARD =====
+  dStock.textContent = currentStock;
+  dIn.textContent = incoming;
+  dOut.textContent = distribution;
+  dReturn.textContent = returns;
+
+  // ===== REPORT =====
+  dStockReport.textContent = currentStock;
+  dInReport.textContent = incoming;
+  dOutReport.textContent = distribution;
+  dReturnReport.textContent = returns;
+
+  // ===== WIDGET =====
+  document.getElementById("incomingStock").textContent = currentStock;
+  document.getElementById("distStock").textContent = currentStock;
+  document.getElementById("distTotal").textContent = distribution;
+  document.getElementById("returnStock").textContent = returns;
 }
+
 
 function renderRecentActivity() {
   const container = document.getElementById("recentActivity");
   if (!container) return;
 
-  const activities = getAllTransactions().slice(0, 5); // ambil 5 terbaru
+  const activities = getAllTransactions().slice(0, 10); 
   container.innerHTML = "";
 
   if (activities.length === 0) {
@@ -408,22 +471,20 @@ function renderReportTable(list) {
 }
 
 function getAllTransactions() {
-  return [
-    ...db.incoming.map(d => ({
-      type: d.qty > 0 ? "INCOMING" : "KEMBALI", date:d.date, qty:d.qty,
-      details:"MBG Kitchen", rep:d.rep ,note:d.notes
-    })),
-    ...db.distribution.map(d => ({
-      type:"DISTRIBUTION", date:d.date, qty:d.qty,
-      details:d.class, rep:d.rep, note:d.notes
-    })),
-    ...db.returns.map(d => ({
-      type:"RETURN", date:d.date, qty:d.qty,
-      details:d.class, rep:d.rep, note:d.notes
+  return db
+    .map(d => ({
+      row: d.row,
+      type: d.qty < 0 ? "KEMBALI": d.type,
+      date: d.date,
+      qty: d.qty,
+      details: d.details,
+      rep: d.rep,
+      note: d.notes || "-"
     }))
-  ].sort((a,b)=>b.date.localeCompare(a.date));
+    .sort((a, b) => b.date.localeCompare(a.date));
 }
 
+// FILTER
 function applyReportFilter() {
   let list = getAllTransactions();
 
@@ -441,6 +502,7 @@ function applyReportFilter() {
   renderReportTable(list);
 }
 
+// DELETE
 let deleteIndex = null;
 
 function openDeleteModal(index) {
@@ -450,116 +512,69 @@ function openDeleteModal(index) {
   ).show();
 }
 
-function deleteTransaction(index) {
+async function deleteTransaction(index) {
   const all = getAllTransactions();
   const item = all[index];
+  console.log(item)
 
-  if (item.type === "INCOMING") {
-    db.incoming.splice(db.incoming.findIndex(d =>
-      d.date === item.date && d.qty === item.qty), 1);
+  if (!item.row) {
+    alert("Error: Nomor baris tidak ditemukan!");
+    return;
   }
 
-  if (item.type === "KEMBALI") {
-    db.incoming.splice(db.incoming.findIndex(d =>
-      d.date === item.date && d.qty === item.qty), 1);
-  }
+  try {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify({
+        action: "deleteRow",
+        row: item.row
+      })
+    });
 
-  if (item.type === "DISTRIBUTION") {
-    db.distribution.splice(db.distribution.findIndex(d =>
-      d.date === item.date && d.qty === item.qty), 1);
+    // Karena kita menggunakan mode default (bukan no-cors), kita bisa cek statusnya
+    alert("Data berhasil dihapus dari Spreadsheet");
+    
+    // Refresh data agar tampilan sinkron dengan kondisi Spreadsheet terbaru
+    if (typeof loadData === "function") {
+      loadData(); 
+    } else {
+      location.reload();
+    }
+  } catch (error) {
+    console.error("Gagal menghapus:", error);
+    alert("Terjadi kesalahan koneksi");
   }
-
-  if (item.type === "RETURN") {
-    db.returns.splice(db.returns.findIndex(d =>
-      d.date === item.date && d.qty === item.qty), 1);
-  }
-
-  save();
-  applyReportFilter();
 }
 
-function confirmDelete() {
+async function confirmDelete() {
   if (deleteIndex === null) return;
 
-  deleteTransaction(deleteIndex);
+  // Tampilkan loading jika perlu
+  const deleteBtn = document.getElementById("hapusRow");
+  const originalText = deleteBtn.innerText;
+  deleteBtn.innerText = "Menghapus...";
+  deleteBtn.disabled = true;
+
+  await deleteTransaction(deleteIndex);
+
   deleteIndex = null;
+  deleteBtn.innerText = originalText;
+  deleteBtn.disabled = false;
 
   const modal = bootstrap.Modal.getInstance(
     document.getElementById("deleteColomModal")
   );
   modal.hide();
 }
-
-// Export CSV
-
-function exportCSV() {
-  // Ambil data sesuai filter yang sedang aktif
-  let list = getAllTransactions();
-
-  if (filterType.value !== "ALL") {
-    list = list.filter(d => d.type === filterType.value);
-  }
-
-  if (filterFrom.value) {
-    list = list.filter(d => d.date >= filterFrom.value);
-  }
-
-  if (filterTo.value) {
-    list = list.filter(d => d.date <= filterTo.value);
-  }
-
-  if (list.length === 0) {
-    alert("No data to export");
-    return;
-  }
-
-  // Header CSV
-  const headers = [
-    "Date",
-    "Type",
-    "Details",
-    "Representative",
-    "Quantity",
-    "Notes"
-  ];
-
-  // Helper untuk escape CSV
-  const escapeCSV = value => {
-    if (value == null) return "";
-    return `"${String(value).replace(/"/g, '""')}"`;
-  };
-
-  // Gabungkan ke format CSV
-  const rows = list.map(d => [
-    d.date,
-    d.type,
-    d.details,
-    d.rep || "-",
-    d.qty,
-    d.note || ""
-  ].map(escapeCSV).join(","));
-
-  const csvContent =
-    headers.join(",") + "\n" +
-    rows.join("\n");
-
-  // Buat file & download
-  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `mbg-report-${new Date().toISOString().slice(0,10)}.csv`;
-  a.click();
-
-  URL.revokeObjectURL(url);
-}
-
 function clearDB(){
-  localStorage.clear()
-  location.reload()
+  fetch(API_URL, {
+    method: "POST",
+    body: new URLSearchParams({ action: "clear" })
+  })
+  .then(r => r.json())
+  .then(res => {
+    window.location.reload()
+  });
 }
 
-renderDashboard();
-renderRecentActivity()
-renderReportTable(getAllTransactions());
+loadDB();
