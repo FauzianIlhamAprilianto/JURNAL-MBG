@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbxMJXbz4qtEi36fIpZFu0bY062cr6S2Wo70IYm86LEOznaQOiF_fNgRF2KsGU8VInHWrg/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbxEIcsCgO5Q0AGnloblHynEMDh03PS5TVsxzcj3CSQvAH45bEeqgS3RzIunU42T2lVXTg/exec";
 
 const dStock = document.getElementById('dStock');
 const dIn = document.getElementById('dIn');
@@ -34,7 +34,7 @@ async function loadDB() {
   try {
     const res = await fetch(API_URL);
     db = await res.json();
-    console.log(db);
+    
     renderDashboard();
     renderRecentActivity();
     renderReportTable(getAllTransactions());
@@ -515,10 +515,8 @@ function openDeleteModal(index) {
 async function deleteTransaction(index) {
   const all = getAllTransactions();
   const item = all[index];
-  console.log(item)
 
   if (!item.row) {
-    alert("Error: Nomor baris tidak ditemukan!");
     return;
   }
 
@@ -530,9 +528,6 @@ async function deleteTransaction(index) {
         row: item.row
       })
     });
-
-    // Karena kita menggunakan mode default (bukan no-cors), kita bisa cek statusnya
-    alert("Data berhasil dihapus dari Spreadsheet");
     
     // Refresh data agar tampilan sinkron dengan kondisi Spreadsheet terbaru
     if (typeof loadData === "function") {
@@ -542,7 +537,6 @@ async function deleteTransaction(index) {
     }
   } catch (error) {
     console.error("Gagal menghapus:", error);
-    alert("Terjadi kesalahan koneksi");
   }
 }
 
@@ -577,4 +571,26 @@ function clearDB(){
   });
 }
 
+// LOCK SCREEN
+let correctPin = "";
+
+async function getPin() {
+  const res = await fetch(API_URL+"?mode=pin");
+  correctPin = (await res.text()).trim();
+}
+function unlockApp() {
+  const input = document.getElementById("lockInput").value;
+
+  if (input === correctPin) {
+    document.getElementById("lockscreen").style.display = "none";
+  } else {
+    showErrorToast('Password Salah')
+  }
+}
+document.getElementById("lockInput").addEventListener("keypress", function(e){
+  if(e.key === "Enter") unlockApp();
+});
+
+// init
+getPin();
 loadDB();
