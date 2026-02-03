@@ -88,6 +88,11 @@ async function addIncoming() {
     inQty.focus();
     return;
   }
+  if(incomingMode == "KEMBALI" && qtyInput > db.filter(d => d.date == today).reduce((a,b) => a+ b.qty,0)){
+    showErrorToast("Jumlah MBG yang anda Kembalikan hari ini tidak bisa lebih dari jumlah yang anda ambil");
+    inQty.focus();
+    return;
+  }
 
   await sendData({
     type: "INCOMING",
@@ -125,8 +130,13 @@ async function addDistribution() {
   if (+outQty.value > stock()) {
     showErrorToast("Stok MBG tidak cukup!")
     outQty.focus()
-    return
+    return;
   };
+  if(db.some(d => d.type == "DISTRIBUTION" && d.details == outClass.value && d.date == today)){
+   showErrorToast("Kelas ini sudah mengambil MBG, jika terdapat kesalahan silahkan perbaiki di menu Reports!")
+    outClass.focus()
+    return;
+  }
   await sendData({
     type: "DISTRIBUTION",
     date: outDate.value,
@@ -159,6 +169,20 @@ async function addReturn() {
     showErrorToast("Nama perwakilan wajib diisi!");
     retRep.focus();
     return
+  };
+  if(!db.some(d => d.type == "DISTRIBUTION" && d.details == retClass.value && d.date == today)){
+    showErrorToast("Kelas ini belum mengambil MBG!")
+    return;
+  };
+  if(retQty.value > db.filter(d => d.date == today & d.details == retClass.value && d.type == "DISTRIBUTION").reduce((a,b) => a+ b.qty,0)){
+    showErrorToast("Jumlah MBG yang anda Kembalikan tidak bisa lebih dari jumlah yang anda ambil");
+    retQty.focus();
+    return;
+  }
+  if(db.some(d => d.type == "RETURN" && d.details == retClass.value && d.date == today)){
+   showErrorToast("Kelas ini sudah mengembalikan MBG, jika terdapat kesalahan silahkan perbaiki di menu Reports!")
+    retClass.focus()
+    return;
   };
   await sendData({
     type: "RETURN",
@@ -198,8 +222,6 @@ function showSuccessToast(message) {
 
   toast.show();
 }
-
-
 
 // INPUT CLASS
 const classData = {
