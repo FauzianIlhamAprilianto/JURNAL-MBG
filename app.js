@@ -18,6 +18,9 @@ const retLevelSelect = document.getElementById("retLevelSelect");
 const retClassSelect = document.getElementById("retClass");
 const outRep = document.getElementById("outRep");
 const retRep = document.getElementById("retRep");
+const submitBtn = document.getElementById("incomingSubmitBtn");
+const submitDistribution = document.getElementById("submitDistribution");
+const submitReturn = document.getElementById("submitReturn");
 
 const today = new Date().toISOString().split("T")[0];
 
@@ -93,7 +96,9 @@ async function addIncoming() {
     inQty.focus();
     return;
   }
-
+  const oriTextIncoming = submitBtn.innerText;
+  submitBtn.innerText = "Memuat data...";
+  submitBtn.disabled = true;
   await sendData({
     type: "INCOMING",
     date: inDate.value,
@@ -102,6 +107,8 @@ async function addIncoming() {
     rep: inRep.value,
     notes: inNotes.value
   });
+  submitBtn.innerText = oriTextIncoming;
+  submitBtn.disabled = false;
 
   showSuccessToast("Data berhasil disimpan ✅");
   document.getElementById("inNotes").value = "";
@@ -137,6 +144,9 @@ async function addDistribution() {
     outClass.focus()
     return;
   }
+  const oriTextDistribution = submitBtn.innerText;
+  submitDistribution.innerText = "Memuat data...";
+  submitDistribution.disabled = true;
   await sendData({
     type: "DISTRIBUTION",
     date: outDate.value,
@@ -145,6 +155,9 @@ async function addDistribution() {
     rep: outRep.value,
     notes: outNotes.value
   });
+  submitDistribution.innerText = oriTextDistribution;
+  submitDistribution.disabled = false;
+  
   showSuccessToast("Data berhasil disimpan ✅");
   document.getElementById("outQty").value = "";
   document.getElementById("outLevelSelect").value = "--Pilih Kelas--";
@@ -184,6 +197,10 @@ async function addReturn() {
     retClass.focus()
     return;
   };
+  
+  const oriTextReturn = submitReturn.innerText;
+  submitReturn.innerText = "Memuat data..."
+  submitReturn.disabled = true;
   await sendData({
     type: "RETURN",
     date: retDate.value,
@@ -192,6 +209,9 @@ async function addReturn() {
     rep: retRep.value,
     notes: retNotes.value
   });
+  submitReturn.innerText = oriTextReturn;
+  submitReturn.disabled = false;
+  
   showSuccessToast("Data berhasil disimpan ✅");
   document.getElementById("retQty").value = "";
   document.getElementById("retLevelSelect").value = "--Pilih Kelas--";
@@ -426,7 +446,6 @@ function setIncomingMode(mode) {
 
   const btnDatang = document.getElementById("btnDatang");
   const btnKembali = document.getElementById("btnKembali");
-  const submitBtn = document.getElementById("incomingSubmitBtn");
 
   if (mode === "DATANG") {
     btnDatang.classList.add("btn-primary", "active");
@@ -582,8 +601,12 @@ async function confirmDelete() {
   );
   modal.hide();
 }
-function clearDB(){
-  fetch(API_URL, {
+async function clearDB(){
+  const deleteBtnData = document.getElementById("hapusData");
+  const oriTextDelete = deleteBtnData.innerText;
+  deleteBtnData.innerText = "Menghapus...";
+  deleteBtnData.disabled = true;
+  await fetch(API_URL, {
     method: "POST",
     body: new URLSearchParams({ action: "clear" })
   })
@@ -591,6 +614,8 @@ function clearDB(){
   .then(res => {
     window.location.reload()
   });
+  deleteBtnData.innerText = oriTextDelete;
+  deleteBtnData.disabled = false;
 }
 
 // LOCK SCREEN
