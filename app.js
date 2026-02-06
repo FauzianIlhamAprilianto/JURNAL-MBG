@@ -18,6 +18,9 @@ const retLevelSelect = document.getElementById("retLevelSelect");
 const retClassSelect = document.getElementById("retClass");
 const outRep = document.getElementById("outRep");
 const retRep = document.getElementById("retRep");
+const submitBtn = document.getElementById("incomingSubmitBtn");
+const submitDistribution = document.getElementById("submitDistribution");
+const submitReturn = document.getElementById("submitReturn");
 
 const today = new Date().toISOString().split("T")[0];
 
@@ -88,7 +91,14 @@ async function addIncoming() {
     inQty.focus();
     return;
   }
-
+  if(incomingMode == "KEMBALI" && qtyInput > db.filter(d => d.date == today).reduce((a,b) => a+ b.qty,0)){
+    showErrorToast("Jumlah MBG yang anda Kembalikan hari ini tidak bisa lebih dari jumlah yang anda ambil");
+    inQty.focus();
+    return;
+  }
+  const oriTextIncoming = submitBtn.innerText;
+  submitBtn.innerText = "Memuat data...";
+  submitBtn.disabled = true;
   await sendData({
     type: "INCOMING",
     date: inDate.value,
@@ -97,6 +107,8 @@ async function addIncoming() {
     rep: inRep.value,
     notes: inNotes.value
   });
+  submitBtn.innerText = oriTextIncoming;
+  submitBtn.disabled = false;
 
   showSuccessToast("Data berhasil disimpan ✅");
   document.getElementById("inNotes").value = "";
@@ -125,8 +137,16 @@ async function addDistribution() {
   if (+outQty.value > stock()) {
     showErrorToast("Stok MBG tidak cukup!")
     outQty.focus()
-    return
+    return;
   };
+  if(db.some(d => d.type == "DISTRIBUTION" && d.details == outClass.value && d.date == today)){
+   showErrorToast("Kelas ini sudah mengambil MBG, jika terdapat kesalahan silahkan perbaiki di menu Reports!")
+    outClass.focus()
+    return;
+  }
+  const oriTextDistribution = submitBtn.innerText;
+  submitDistribution.innerText = "Memuat data...";
+  submitDistribution.disabled = true;
   await sendData({
     type: "DISTRIBUTION",
     date: outDate.value,
@@ -135,6 +155,9 @@ async function addDistribution() {
     rep: outRep.value,
     notes: outNotes.value
   });
+  submitDistribution.innerText = oriTextDistribution;
+  submitDistribution.disabled = false;
+  
   showSuccessToast("Data berhasil disimpan ✅");
   document.getElementById("outQty").value = "";
   document.getElementById("outLevelSelect").value = "--Pilih Kelas--";
@@ -160,6 +183,24 @@ async function addReturn() {
     retRep.focus();
     return
   };
+  if(!db.some(d => d.type == "DISTRIBUTION" && d.details == retClass.value && d.date == today)){
+    showErrorToast("Kelas ini belum mengambil MBG!")
+    return;
+  };
+  if(retQty.value > db.filter(d => d.date == today & d.details == retClass.value && d.type == "DISTRIBUTION").reduce((a,b) => a+ b.qty,0)){
+    showErrorToast("Jumlah MBG yang anda Kembalikan tidak bisa lebih dari jumlah yang anda ambil");
+    retQty.focus();
+    return;
+  }
+  if(db.some(d => d.type == "RETURN" && d.details == retClass.value && d.date == today)){
+   showErrorToast("Kelas ini sudah mengembalikan MBG, jika terdapat kesalahan silahkan perbaiki di menu Reports!")
+    retClass.focus()
+    return;
+  };
+  
+  const oriTextReturn = submitReturn.innerText;
+  submitReturn.innerText = "Memuat data..."
+  submitReturn.disabled = true;
   await sendData({
     type: "RETURN",
     date: retDate.value,
@@ -168,6 +209,9 @@ async function addReturn() {
     rep: retRep.value,
     notes: retNotes.value
   });
+  submitReturn.innerText = oriTextReturn;
+  submitReturn.disabled = false;
+  
   showSuccessToast("Data berhasil disimpan ✅");
   document.getElementById("retQty").value = "";
   document.getElementById("retLevelSelect").value = "--Pilih Kelas--";
@@ -198,8 +242,6 @@ function showSuccessToast(message) {
 
   toast.show();
 }
-
-
 
 // INPUT CLASS
 const classData = {
@@ -404,7 +446,6 @@ function setIncomingMode(mode) {
 
   const btnDatang = document.getElementById("btnDatang");
   const btnKembali = document.getElementById("btnKembali");
-  const submitBtn = document.getElementById("incomingSubmitBtn");
 
   if (mode === "DATANG") {
     btnDatang.classList.add("btn-primary", "active");
@@ -560,8 +601,12 @@ async function confirmDelete() {
   );
   modal.hide();
 }
-function clearDB(){
-  fetch(API_URL, {
+async function clearDB(){
+  const deleteBtnData = document.getElementById("hapusData");
+  const oriTextDelete = deleteBtnData.innerText;
+  deleteBtnData.innerText = "Menghapus...";
+  deleteBtnData.disabled = true;
+  await fetch(API_URL, {
     method: "POST",
     body: new URLSearchParams({ action: "clear" })
   })
@@ -569,6 +614,8 @@ function clearDB(){
   .then(res => {
     window.location.reload()
   });
+  deleteBtnData.innerText = oriTextDelete;
+  deleteBtnData.disabled = false;
 }
 
 // LOCK SCREEN
