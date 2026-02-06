@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbxEIcsCgO5Q0AGnloblHynEMDh03PS5TVsxzcj3CSQvAH45bEeqgS3RzIunU42T2lVXTg/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzgVrBgM7VfyF5UHrCU2F9Cbn5PLjROBsIsmvXC8LovymHbUB6iciGb_h_rb2B8akQZXA/exec";
 
 const dStock = document.getElementById('dStock');
 const dIn = document.getElementById('dIn');
@@ -25,10 +25,11 @@ const submitReturn = document.getElementById("submitReturn");
 const today = new Date().toISOString().split("T")[0];
 
 document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll('input[type="date"]').forEach(i => {
+  document.querySelectorAll('input[type="date"]:not(.no-auto-date)').forEach(i => {
     i.value = today;
   });
 });
+
 
 // DATABASE SPREADSHEET
 let db = {};
@@ -46,17 +47,26 @@ async function loadDB() {
   }
 }
 
-async function sendData(data) {
+// async function sendData(data) {
+//   await fetch(API_URL, {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "text/plain"
+//     },
+//     body: JSON.stringify(data)
+//   });
+
+//   setTimeout(loadDB, 1000);
+// }
+async function sendData(data, action="add", row=null) {
   await fetch(API_URL, {
     method: "POST",
-    headers: {
-      "Content-Type": "text/plain"
-    },
-    body: JSON.stringify(data)
+    headers: { "Content-Type": "text/plain" },
+    body: JSON.stringify({ action, row, ...data })
   });
-
   setTimeout(loadDB, 1000);
 }
+
 
 function showPage(id, btn) {
   document.querySelectorAll("main section").forEach(s => s.classList.add("d-none"));
@@ -91,6 +101,11 @@ async function addIncoming() {
     inQty.focus();
     return;
   }
+  if (!inRep.value) {
+    showErrorToast("Nama perwakilan wajib diisi!");
+    inRep.focus()
+    return
+  };
   if(incomingMode == "KEMBALI" && qtyInput > db.filter(d => d.date == today).reduce((a,b) => a+ b.qty,0)){
     showErrorToast("Jumlah MBG yang anda Kembalikan hari ini tidak bisa lebih dari jumlah yang anda ambil");
     inQty.focus();
@@ -465,6 +480,15 @@ function setIncomingMode(mode) {
   }
 }
 
+// RETURN
+const returnKelas = document.getElementById('returnKelas')
+let jumlahReturnKelas = '';
+retClassSelect.addEventListener("change", (data)=>{
+  jumlahReturnKelas = db.filter(d => d.date === today && d.type === "DISTRIBUTION" && d.details == data.target.value).reduce((a,b)=>a+b.qty,0) - db.filter(d => d.date === today && d.type === "RETURN" && d.details == data.target.value).reduce((a,b)=>a+b.qty,0)
+  returnKelas.textContent = jumlahReturnKelas;
+})
+
+
 // REPORT
 function truncateText(text, max = 30) {
   if (!text) return "";
@@ -501,9 +525,14 @@ function renderReportTable(list) {
         <td class="fw-bold">${d.qty}</td>
         <td>
           <button
-            class="btn btn-danger btn-sm action-delete"
+            class="btn btn-danger btn-sm action-delete action-btn"
             onclick="openDeleteModal(${i})">
             🗑
+          </button>          
+          <button
+            class="btn btn-warning btn-sm action-delete action-btn"
+            onclick="openEditModal(${i})">
+            ✏️
           </button>
         </td>
       </tr>
@@ -618,12 +647,66 @@ async function clearDB(){
   deleteBtnData.disabled = false;
 }
 
+// EDIT
+function openEditModal(index) {
+  const all = getAllTransactions();
+  const item = all[index];
+
+  document.getElementById("editRow").value = item.row;
+  document.getElementById("editDate").value = item.date;
+  document.getElementById("editQty").value = item.qty;
+  document.getElementById("editDetails").value = item.details;
+  document.getElementById("editRep").value = item.rep;
+  document.getElementById("editNotes").value = item.note;
+
+  new bootstrap.Modal(document.getElementById("editModal")).show();
+}
+
+const editQty = document.getElementById("editQty")
+async function saveEdit() {
+  const row = document.getElementById("editRow").value;
+  const all = getAllTransactions();
+  const item = all.find(d => d.row == row);
+  if (item.type != "KEMBALI" && editQty.value <= 0) {
+    showErrorToast("Quantity wajib diisi dan minimal 1!")
+    editQty.focus()
+    return
+  }
+  if (!editRep.value) {
+    showErrorToast("Nama perwakilan wajib diisi!");
+    editRep.focus()
+    return
+  };
+
+  const editBtnData = document.getElementById("editBtn");
+  const oriTextEdit = editBtnData.innerText;
+  editBtnData.innerText = "Mengupdate...";
+  editBtnData.disabled = true;
+
+  await sendData({
+    date: item.date,
+    type: item.type,
+    qty: +editQty.value,
+    details: editDetails.value,
+    rep: editRep.value,
+    notes: editNotes.value
+  }, "update", row);
+
+  editBtnData.innerText = oriTextEdit;
+  editBtnData.disabled = false;
+
+  bootstrap.Modal.getInstance(document.getElementById("editModal")).hide();
+
+  showSuccessToast("Data berhasil diperbarui ✨");
+}
+
 // LOCK SCREEN
 let correctPin = "";
 
 async function getPin() {
   const res = await fetch(API_URL+"?mode=pin");
   correctPin = (await res.text()).trim();
+  document.getElementById("lockScreenBtn").disabled = false;
 }
 function unlockApp() {
   const input = document.getElementById("lockInput").value;
