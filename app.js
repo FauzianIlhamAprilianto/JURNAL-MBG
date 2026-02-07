@@ -816,6 +816,24 @@ document.getElementById("lockInput").addEventListener("keypress", function(e){
   if(e.key === "Enter") unlockApp();
 });
 
+// RESPONSIVE MOBILE MENU
+const sidebar = document.querySelector(".sidebar");
+
+const overlay = document.createElement("div");
+overlay.className = "menu-overlay";
+document.body.appendChild(overlay);
+
+document.getElementById("menuToggle").addEventListener("click", () => {
+  sidebar.classList.add("show");
+  overlay.classList.add("show");
+});
+
+overlay.addEventListener("click", () => {
+  sidebar.classList.remove("show");
+  overlay.classList.remove("show");
+});
+
+
 // init
 getPin();
 loadDB();
