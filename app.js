@@ -30,7 +30,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-
 // DATABASE SPREADSHEET
 let db = {};
 
@@ -45,19 +44,10 @@ async function loadDB() {
   } catch (err) {
     console.error("Gagal load DB:", err);
   }
+  renderClassPanel();
+  updateDailyClassCounters(); 
 }
 
-// async function sendData(data) {
-//   await fetch(API_URL, {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "text/plain"
-//     },
-//     body: JSON.stringify(data)
-//   });
-
-//   setTimeout(loadDB, 1000);
-// }
 async function sendData(data, action="add", row=null) {
   await fetch(API_URL, {
     method: "POST",
@@ -159,7 +149,7 @@ async function addDistribution() {
     outClass.focus()
     return;
   }
-  const oriTextDistribution = submitBtn.innerText;
+  const oriTextDistribution = submitDistribution.innerText;
   submitDistribution.innerText = "Memuat data...";
   submitDistribution.disabled = true;
   await sendData({
@@ -234,6 +224,7 @@ async function addReturn() {
   document.getElementById("retNotes").value = "";
   document.getElementById("retClass").disabled = true;
   document.getElementById("retClass").value = "";
+  document.getElementById("returnKelas").textContent = "0";
 }
 
 // TOAST
@@ -481,13 +472,117 @@ function setIncomingMode(mode) {
 }
 
 // RETURN
-const returnKelas = document.getElementById('returnKelas')
-let jumlahReturnKelas = '';
-retClassSelect.addEventListener("change", (data)=>{
-  jumlahReturnKelas = db.filter(d => d.date === today && d.type === "DISTRIBUTION" && d.details == data.target.value).reduce((a,b)=>a+b.qty,0) - db.filter(d => d.date === today && d.type === "RETURN" && d.details == data.target.value).reduce((a,b)=>a+b.qty,0)
-  returnKelas.textContent = jumlahReturnKelas;
-})
+function updateReturnKelasDisplay(cls) {
+  if (!cls) return;
 
+  const totalDistribusi = db
+    .filter(d => d.date === today && d.type === "DISTRIBUTION" && d.details == cls)
+    .reduce((a,b)=>a+b.qty,0);
+
+  const totalReturn = db
+    .filter(d => d.date === today && d.type === "RETURN" && d.details == cls)
+    .reduce((a,b)=>a+b.qty,0);
+
+  returnKelas.textContent = totalDistribusi - totalReturn;
+}
+retClassSelect.addEventListener("change", (e) => {
+  updateReturnKelasDisplay(e.target.value);
+});
+
+
+// RECAPS
+let currentMode = "DISTRIBUTION";
+
+function setMode(mode) {
+  currentMode = mode;
+  modeDist.classList.toggle("active", mode === "DISTRIBUTION");
+  modeReturn.classList.toggle("active", mode === "RETURN");
+  renderClassPanel();
+}
+
+function renderClassPanel() {
+  const container = document.getElementById("classPanel");
+  container.innerHTML = "";
+
+  [10,11,12].forEach(level => {
+    const group = document.createElement("div");
+    group.className = "class-group";
+
+    const title = document.createElement("div");
+    title.className = "class-title";
+    title.textContent = `Kelas ${level}`;
+
+    const grid = document.createElement("div");
+    grid.className = "class-grid";
+
+    classData[level].forEach(cls => {
+      const btn = document.createElement("button");
+      btn.textContent = cls;
+      btn.className = "class-button";
+
+      const todayData = db.filter(d => d.date === today);
+
+      const distributed = todayData.some(d => d.type === "DISTRIBUTION" && d.details === cls);
+      const returned = todayData.some(d => d.type === "RETURN" && d.details === cls);
+
+      if (currentMode === "DISTRIBUTION") {
+        btn.classList.add(distributed ? "orange" : "gray");
+      } else {
+        btn.classList.add(returned ? "purple" : "gray");
+      }
+      btn.onclick = () => {
+        if(currentMode === "DISTRIBUTION"){
+          showPage('distribution', document.querySelector('[onclick*="distribution"]'));
+          selectClass(outLevelSelect, outClassSelect, cls);
+        }else if(currentMode === "RETURN"){
+          showPage('return', document.querySelector('[onclick*="return"]'));
+          selectClass(retLevelSelect, retClassSelect, cls);
+        }
+      };
+      grid.appendChild(btn);
+    });
+
+    group.appendChild(title);
+    group.appendChild(grid);
+    container.appendChild(group);
+  });
+}
+function selectClass(levelSelect, classSelect, cls) {
+  const level = cls.split("-")[0];
+
+  levelSelect.value = level;
+  classSelect.innerHTML = `<option value="">--Pilih Kelas--</option>`;
+
+  classData[level].forEach(c => {
+    const opt = document.createElement("option");
+    opt.value = c;
+    opt.textContent = c;
+    if (c === cls) opt.selected = true;
+    classSelect.appendChild(opt);
+  });
+
+  classSelect.disabled = false;
+
+  classSelect.dispatchEvent(new Event("change"));
+}
+function updateDailyClassCounters() {
+  const todayData = db.filter(d => d.date === today);
+
+  // Ambil kelas unik untuk masing-masing tipe
+  const distribClasses = new Set(
+    todayData
+      .filter(d => d.type === "DISTRIBUTION")
+      .map(d => d.details)
+  );
+
+  const returnClasses = new Set(
+    todayData
+      .filter(d => d.type === "RETURN")
+      .map(d => d.details)
+  );
+  document.getElementById("disRecaps").textContent = distribClasses.size;
+  document.getElementById("retRecaps").textContent = returnClasses.size;
+}
 
 // REPORT
 function truncateText(text, max = 30) {

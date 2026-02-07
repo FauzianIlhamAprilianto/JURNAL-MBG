@@ -489,3 +489,149 @@ body {
   font-size: 13px;
   color: #475569;
 }
+
+
+/* RECAPS */
+.class-recap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 10px;
+}
+
+.class-btn {
+  padding: 10px 0;
+  border-radius: 12px;
+  font-weight: 600;
+  border: none;
+  transition: .2s;
+}
+
+.class-gray {
+  background: #e5e7eb;
+  color: #64748b;
+}
+
+.class-orange {
+  background: #fff7e6;
+  color: #ea580c;
+}
+
+.class-purple {
+  background: #f5ecff;
+  color: #7c3aed;
+}
+
+/* MODE BUTTON */
+.mode-toggle {
+  display: flex;
+  gap: 8px;
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 10px 0;
+  border-radius: 999px;
+  border: 1px solid #2563eb;
+  background: white;
+  color: #2563eb;
+  font-weight: 600;
+  transition: .2s;
+}
+
+.mode-btn.active {
+  background: #2563eb;
+  color: white;
+}
+
+/* PANEL KELAS */
+.class-group {
+  margin-bottom: 28px;
+}
+
+.class-title {
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #1e293b;
+}
+
+.class-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+  gap: 10px;
+}
+
+.gray { background:#e5e7eb; color:#64748b; }
+.orange {
+  background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+  color: #ea580c;
+  border: 1px solid #fdba74;
+}
+
+.purple {
+  background: linear-gradient(135deg, #f3e8ff, #e9d5ff);
+  color: #7c3aed;
+  border: 1px solid #c4b5fd;
+}
+
+
+/* ===== RECAP PAGE LAYOUT ===== */
+
+.recap-page {
+  width: 100%;
+  max-width: 100%;
+  padding: 20px 30px 40px;
+}
+
+.recap-page .mode-toggle {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 14px 0;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+/* GRID KELAS */
+.class-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
+  gap: 12px;
+}
+
+/* SPACING PER LEVEL */
+.class-group {
+  margin-bottom: 34px;
+}
+
+.class-title {
+  font-weight: 700;
+  margin-bottom: 14px;
+  font-size: 16px;
+  color: #0f172a;
+}
+
+ .class-button {
+  padding: 12px 0;
+  border-radius: 14px;
+  font-weight: 600;
+  font-size: 14px;
+  border: 2px solid #e5e7eb; /* abu soft */
+  transition: all .2s ease;
+}
+
+.class-button:hover {
+  border-color: #3b82f6; /* biru modern */
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+}
+
+.class-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 14px;
+}
