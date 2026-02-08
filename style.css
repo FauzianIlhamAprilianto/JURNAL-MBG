@@ -297,18 +297,17 @@ body {
   border-radius: 10px;
   padding: 0 14px;
   display: inline-flex;
+  justify-content: center;
   align-items: center;
   gap: 6px;
   font-weight: 600;
+  transition: all .2s ease;
 }
 
 .icon-btn i {
   font-size: 16px;
 }
 
-.icon-btn {
-  transition: all .2s ease;
-}
 .icon-btn:hover {
   transform: translateY(-1px);
 }
@@ -715,5 +714,132 @@ body {
 
   .stat-card {
     height: auto;
+  }
+}
+
+/* ============================= */
+/* 📱 MOBILE FORM OPTIMIZATION  */
+/* ============================= */
+@media (max-width: 768px) {
+
+  .incoming-card {
+    max-width: 100%;
+    border-radius: 18px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.08);
+  }
+
+  /* Semua grid form jadi 1 kolom */
+  .incoming-card .row > div {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  .incoming-card .form-control,
+  .incoming-card .form-select {
+    font-size: 16px; /* biar tidak zoom di iPhone */
+    padding: 12px 14px;
+  }
+
+  .incoming-card button {
+    padding: 14px;
+    font-size: 16px;
+  }
+
+  /* Badge info stock di header form */
+  .badge-stock {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Header section biar stack */
+  #incoming .d-flex,
+  #distribution .d-flex,
+  #return .d-flex {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 12px;
+  }
+}
+
+/* ============================= */
+/* 📱 REPORT FILTER MOBILE FIX  */
+/* ============================= */
+@media (max-width: 768px) {
+
+  .report-toolbar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  .report-toolbar p {
+    display: none; /* hapus tanda _ di mobile */
+  }
+
+  .report-toolbar .report-input,
+  .report-toolbar .icon-btn {
+    width: 100%;
+  }
+
+  .report-toolbar select,
+  .report-toolbar input {
+    min-width: 100% !important;
+  }
+
+  .table-responsive {
+    border-radius: 14px;
+    overflow-x: auto;
+  }
+
+  table th,
+  table td {
+    white-space: nowrap;
+    font-size: 13px;
+  }
+}
+@media (max-width: 768px) {
+  .page-section {
+    padding: 18px 12px;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  .stat-card {
+    padding: 16px;
+  }
+}
+/* ============================= */
+/* 📱 MOBILE COUNTER STYLE FIX  */
+/* ============================= */
+@media (max-width: 768px) {
+
+  /* Header section jadi vertikal */
+  #distribution .d-flex,
+  #return .d-flex,
+  #recaps .d-flex {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  /* Counter box full lebar */
+  .badge-stock {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  /* Jarak antar counter */
+  #distribution .badge-stock,
+  #return .badge-stock,
+  #recaps .badge-stock {
+    margin-bottom: 10px;
+  }
+
+  /* Spasi bawah judul */
+  #distribution h2,
+  #return h2,
+  #recaps h2 {
+    margin-bottom: 6px;
   }
 }
