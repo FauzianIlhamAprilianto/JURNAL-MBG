@@ -299,60 +299,60 @@ retLevelSelect.addEventListener("change", () => {
 // INCOMING COUNTER
 const boxIn = document.getElementById("dBoxIn");
 boxIn.addEventListener("mouseenter", () => {
-  document.getElementById('labelIn').textContent = "TOTAL RECEIVED";
+  document.getElementById('labelIn').textContent = "TOTAL DATANG";
   dIn.textContent = db.filter(item => item.qty > 0 && item.type === "INCOMING").reduce((a,b)=>a+b.qty,0);
 });
 boxIn.addEventListener("mouseleave", () => {
-  document.getElementById('labelIn').textContent = "TODAY RECEIVED";
+  document.getElementById('labelIn').textContent = "DATANG";
   dIn.textContent = db.filter(item => item.date === today && item.qty > 0 && item.type === "INCOMING").reduce((a,b)=>a+b.qty,0);
 });
 const boxInReport = document.getElementById("dBoxInReport");
 boxInReport.addEventListener("mouseenter", () => {
-  document.getElementById('labelInReport').textContent = "TOTAL RECEIVED";
+  document.getElementById('labelInReport').textContent = "TOTAL DATANG";
   dInReport.textContent = db.filter(item => item.qty > 0 && item.type === "INCOMING").reduce((a,b)=>a+b.qty,0);
 });
 boxInReport.addEventListener("mouseleave", () => {
-  document.getElementById('labelInReport').textContent = "TODAY RECEIVED";
+  document.getElementById('labelInReport').textContent = "DATANG";
   dInReport.textContent = db.filter(item => item.date === today && item.qty > 0 && item.type === "INCOMING").reduce((a,b)=>a+b.qty,0);
 });
 
 // DISTRIBUTED COUNTER
 const boxOut = document.getElementById("dBoxOut");
 boxOut.addEventListener("mouseenter", () => {
-  document.getElementById('labelOut').textContent = "TOTAL DISTRIBUTED";
+  document.getElementById('labelOut').textContent = "TOTAL DISTRIBUSI";
   dOut.textContent = db.filter(d => d.type === "DISTRIBUTION").reduce((a,b)=>a+b.qty,0);
 });
 boxOut.addEventListener("mouseleave", () => {
-  document.getElementById('labelOut').textContent = "TODAY DISTRIBUTED";
+  document.getElementById('labelOut').textContent = "DISTRIBUSI";
   dOut.textContent = db.filter(d => d.date === today && d.type === "DISTRIBUTION").reduce((a,b)=>a+b.qty,0);
 });
 const boxOutReport = document.getElementById("dBoxOutReport");
 boxOutReport.addEventListener("mouseenter", () => {
-  document.getElementById('labelOutReport').textContent = "TOTAL DISTRIBUTED";
+  document.getElementById('labelOutReport').textContent = "TOTAL DISTRIBUSI";
   dOutReport.textContent = db.filter(d => d.type === "DISTRIBUTION").reduce((a,b)=>a+b.qty,0);
 });
 boxOutReport.addEventListener("mouseleave", () => {
-  document.getElementById('labelOutReport').textContent = "TODAY DISTRIBUTED";
+  document.getElementById('labelOutReport').textContent = "DISTRIBUSI";
   dOutReport.textContent = db.filter(d => d.date === today && d.type === "DISTRIBUTION").reduce((a,b)=>a+b.qty,0);
 });
 
 // RETURNED COUNTER
 const boxReturn = document.getElementById("dBoxReturn");
 boxReturn.addEventListener("mouseenter", () => {
-  document.getElementById('labelReturn').textContent = "TOTAL RETURNED";
+  document.getElementById('labelReturn').textContent = "TOTAL KEMBALI";
   dReturn.textContent =  db.filter(d => d.type === "RETURN").reduce((a,b)=>a+b.qty,0);
 });
 boxReturn.addEventListener("mouseleave", () => {
-  document.getElementById('labelReturn').textContent = "TODAY RETURNED";
+  document.getElementById('labelReturn').textContent = "KEMBALI";
   dReturn.textContent = db.filter(d => d.date === today && d.type === "RETURN").reduce((a,b)=>a+b.qty,0);
 });
 const boxReturnReport = document.getElementById("dBoxReturnReport");
 boxReturnReport.addEventListener("mouseenter", () => {
-  document.getElementById('labelReturnReport').textContent = "TOTAL RETURNED";
+  document.getElementById('labelReturnReport').textContent = "TOTAL KEMBALI";
   dReturnReport.textContent =  db.filter(d => d.type === "RETURN").reduce((a,b)=>a+b.qty,0);
 });
 boxReturnReport.addEventListener("mouseleave", () => {
-  document.getElementById('labelReturnReport').textContent = "TODAY RETURNED";
+  document.getElementById('labelReturnReport').textContent = "KEMBALI";
   dReturnReport.textContent = db.filter(d => d.date === today && d.type === "RETURN").reduce((a,b)=>a+b.qty,0);
 });
 
