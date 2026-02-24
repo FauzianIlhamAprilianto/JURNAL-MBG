@@ -33,27 +33,27 @@
 
       <button onclick="showPage('incoming', this)">
         <i class="bi bi-download"></i>
-        Incoming
+        Datang
       </button>
 
       <button onclick="showPage('distribution', this)">
         <i class="bi bi-upload"></i>
-        Distribution
+        Distribusi
       </button>
 
       <button onclick="showPage('return', this)">
         <i class="bi bi-arrow-counterclockwise"></i>
-        Return
+        Kembali
       </button>
 
       <button onclick="showPage('recaps', this)">
         <i class="bi bi-clipboard-data"></i>
-        Recaps
+        Rekap
       </button>
 
       <button onclick="showPage('reports', this)">
         <i class="bi bi-clock-history"></i>
-        Reports
+        Laporan
       </button>
     </nav>
   </aside>
@@ -71,13 +71,13 @@
     <!-- DASHBOARD -->
     <section id="dashboard">
       <h2>Dashboard</h2>
-      <p class="text-muted">Overview of MBG stock and recent activities.</p>
+      <p class="text-muted">Ringkasan dari stok MBG dan aktifitas terbaru.</p>
 
       <div class="row g-4 mb-4">
         <div class="col-md-3">
           <div class="stat-card blue">
             <div class="stat-header">
-              <small>CURRENT STOCK</small>
+              <small>Stok Saat Ini</small>
               <i class="bi bi-box-seam"></i>
             </div>
             <h3 id="dStock">0</h3>
@@ -87,7 +87,7 @@
         <div id="dBoxIn" class="col-md-3">
           <div class="stat-card green">
             <div class="stat-header">
-              <small id="labelIn">TODAY RECEIVED</small>
+              <small id="labelIn">Datang Hari Ini</small>
               <i class="bi bi-download"></i>
             </div>
             <h3 id="dIn">0</h3>
@@ -97,7 +97,7 @@
         <div id="dBoxOut" class="col-md-3">
           <div class="stat-card yellow">
             <div class="stat-header">
-              <small id="labelOut">TODAY DISTRIBUTED</small>
+              <small id="labelOut">Distribusi Hari Ini</small>
               <i class="bi bi-upload"></i>
             </div>
             <h3 id="dOut">0</h3>
@@ -107,7 +107,7 @@
         <div id="dBoxReturn" class="col-md-3">
           <div class="stat-card purple">
             <div class="stat-header">
-              <small id="labelReturn">TODAY RETURNED</small>
+              <small id="labelReturn">Kembali Hari Ini</small>
               <i class="bi bi-arrow-counterclockwise"></i>
             </div>
             <h3 id="dReturn">0</h3>
@@ -118,9 +118,9 @@
     <div class="card">
       <div class="card-body">
         <div class="d-flex justify-content-between mb-3">
-          <h5 class="fw-bold mb-0">Recent Activity</h5>
+          <h5 class="fw-bold mb-0">Aktifitas Terbaru</h5>
           <small class="text-primary cursor-pointer" onclick="showPage('reports', this)">
-            View All
+            Semua
           </small>
         </div>
 
@@ -136,62 +136,48 @@
     <section id="incoming" class="page-section d-none">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-          <h2 class="fw-bold mb-1">Incoming MBG</h2>
-          <p class="text-muted mb-0">Record new stock arriving from the kitchen.</p>
+          <h2 class="fw-bold mb-1">MBG Datang</h2>
+          <p class="text-muted mb-0">Mencatat stok baru yang tiba dari dapur.</p>
         </div>
 
         <div class="badge-stock">
           <i class="bi bi-box-seam"></i>
-          Current Stock: <span id="incomingStock">0</span>
+          Stok: <span id="incomingStock">0</span>
         </div>
       </div>
 
       <div class="card incoming-card">
         <div class="card-body">
-          <h4 class="text-primary fw-bold mb-1">Receive MBG</h4>
+          <h4 class="text-primary fw-bold mb-1">MBG Kembali</h4>
           <p class="text-muted mb-4">
-            Enter details of the MBG delivery from the kitchen.
+            Masukkan detail pengiriman MBG dari dapur.
           </p>
           <!-- Toggle Datang / Kembali -->
           <div class="d-flex justify-content-center mb-4">
-            <div class="btn-group incoming-toggle" role="group">
-              <button
-                type="button"
-                class="btn btn-primary active"
-                id="btnDatang"
-                onclick="setIncomingMode('DATANG')">
-                Datang
-              </button>
-
-              <button
-                type="button"
-                class="btn btn-outline-primary"
-                id="btnKembali"
-                onclick="setIncomingMode('KEMBALI')">
-                Kembali
-              </button>
-            </div>
+              <div class="btn-group w-100" role="group" style="max-width: 400px;"> <button type="button" class="btn btn-primary active w-50" id="btnDatang" onclick="setIncomingMode('DATANG')">Datang</button>
+                <button type="button" class="btn btn-outline-primary w-50" id="btnKembali" onclick="setIncomingMode('KEMBALI')">Kembali</button>
+              </div>
           </div>
           <div class="row g-3">
             <div class="col-md-6">
-              <label class="form-label">Date</label>
+              <label class="form-label">Tanggal</label>
               <input type="date" id="inDate" class="form-control">
             </div>
 
             <div class="col-md-6">
-              <label class="form-label">Quantity</label>
+              <label class="form-label">Jumlah</label>
               <input type="number" id="inQty" class="form-control" min="1">
             </div>
 
             <div class="col-12">
-              <label class="form-label">Source</label>
+              <label class="form-label">Sumber</label>
               <select id="inMBG" class="form-select">
-                <option>MBG Kitchen</option>
+                <option>Dapur MBG</option>
               </select>
             </div>
 
             <div class="col-12">
-              <label class="form-label">Representative Name</label>
+              <label class="form-label">Perwakilan</label>
               <input
                 type="text"
                 id="inRep"
@@ -200,7 +186,7 @@
             </div>
 
             <div class="col-12">
-              <label class="form-label">Notes (Optional)</label>
+              <label class="form-label">Pesan (Optional)</label>
               <textarea
                 id="inNotes"
                 class="form-control"
@@ -224,19 +210,19 @@
       <!-- Header -->
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-          <h2 class="fw-bold mb-1">Distribution</h2>
-          <p class="text-muted mb-0">Distribute MBG stock to classes.</p>
+          <h2 class="fw-bold mb-1">Distribusi</h2>
+          <p class="text-muted mb-0">Bagikan stok MBG ke setiap kelas.</p>
         </div>
 
         <div class="d-flex gap-3 flex-wrap">
           <div class="badge-stock">
             <i class="bi bi-box-seam"></i>
-            Available to Distribute:
+            Siap di Distribusi:
             <span id="distStock">0</span>
           </div>
           <div class="badge-stock">
             <i class="bi bi-box-arrow-up"></i>
-            Today Distributed:
+            Terdistribusi:
             <span id="distTotal">0</span>
           </div>
         </div>
@@ -246,24 +232,24 @@
       <!-- Card -->
       <div class="card incoming-card">
         <div class="card-body">
-          <h4 class="text-primary fw-bold mb-1">Distribute to Class</h4>
+          <h4 class="text-primary fw-bold mb-1">Kelas</h4>
           <p class="text-muted mb-4">
-            Record items being taken by a class representative.
+            Catat barang-barang yang diambil oleh perwakilan kelas.
           </p>
 
           <div class="row g-3">
             <div class="col-md-6">
-              <label class="form-label">Date</label>
+              <label class="form-label">Tanggal</label>
               <input type="date" id="outDate" class="form-control" disabled>
             </div>
 
             <div class="col-md-6">
-              <label class="form-label">Quantity</label>
+              <label class="form-label">Jumlah</label>
               <input type="number" id="outQty" class="form-control" min="1">
             </div>
 
             <div class="col-md-6">
-              <label class="form-label">Class</label>
+              <label class="form-label">Kelas</label>
               <select id="outLevelSelect" class="form-select">
                 <option>--Pilih Kelas--</option>
                 <option>10</option>
@@ -272,14 +258,14 @@
               </select>
             </div>
             <div class="col-md-6">
-              <label class="form-label">Class Name</label>
+              <label class="form-label">Kelas</label>
               <select id="outClass" class="form-select" disabled>
                 <option value="">--Pilih Kelas--</option>
               </select>
             </div>
 
             <div class="col-12">
-              <label class="form-label">Representative Name</label>
+              <label class="form-label">Perwakilan</label>
               <input
                 type="text"
                 id="outRep"
@@ -288,7 +274,7 @@
             </div>
 
             <div class="col-12">
-              <label class="form-label">Notes (Optional)</label>
+              <label class="form-label">Pesan (Optional)</label>
               <textarea
                 id="outNotes"
                 class="form-control"
@@ -300,7 +286,7 @@
           <button
             class="btn btn-primary w-100 mt-4 py-2"
             id="submitDistribution"
-            onclick="addDistribution()">Submit Distribution</button>
+            onclick="addDistribution()">Submit Distribusi</button>
         </div>
       </div>
     </section>
@@ -311,9 +297,9 @@
       <!-- Header -->
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-          <h2 class="fw-bold mb-1">Returns</h2>
+          <h2 class="fw-bold mb-1">Kembali</h2>
           <p class="text-muted mb-0">
-            Record items returned by classes back to stock.
+            Catat barang-barang yang dikembalikan oleh kelas ke dalam Stok.
           </p>
         </div>
 
@@ -325,7 +311,7 @@
           </div>
           <div class="badge-stock badge-purple">
             <i class="bi bi-arrow-counterclockwise"></i>
-            Total Pengembalian:
+            Dikembalian:
             <span id="returnStock">0</span>
           </div>
         </div>
@@ -335,24 +321,24 @@
       <!-- Card -->
       <div class="card incoming-card">
         <div class="card-body">
-          <h4 class="text-primary fw-bold mb-1">Class Return</h4>
+          <h4 class="text-primary fw-bold mb-1">Kelas</h4>
           <p class="text-muted mb-4">
-            Enter details of MBG items being returned.
+            Masukkan detail barang MBG yang dikembalikan.
           </p>
 
           <div class="row g-3">
             <div class="col-md-6">
-              <label class="form-label">Date</label>
+              <label class="form-label">Tanggal</label>
               <input type="date" id="retDate" class="form-control" disabled>
             </div>
 
             <div class="col-md-6">
-              <label class="form-label">Quantity</label>
+              <label class="form-label">Jumlah</label>
               <input type="number" id="retQty" class="form-control" min="1">
             </div>
 
             <div class="col-md-6">
-              <label class="form-label">Class</label>
+              <label class="form-label">Kelas</label>
               <select id="retLevelSelect" class="form-select">
                 <option>--Pilih Kelas--</option>
                 <option>10</option>
@@ -362,14 +348,14 @@
             </div>
 
             <div class="col-md-6">
-              <label class="form-label">Class Name</label>
+              <label class="form-label">Kelas</label>
               <select id="retClass" class="form-select" disabled>
                 <option>--Pilih Kelas--</option>
               </select>
             </div>
 
             <div class="col-12">
-              <label class="form-label">Representative Name</label>
+              <label class="form-label">Perwakilan</label>
               <input
                 type="text"
                 id="retRep"
@@ -378,7 +364,7 @@
             </div>
 
             <div class="col-12">
-              <label class="form-label">Notes (Optional)</label>
+              <label class="form-label">Pesan (Optional)</label>
               <textarea
                 id="retNotes"
                 class="form-control"
@@ -391,7 +377,7 @@
             class="btn btn-primary w-100 mt-4 py-2"
             id="submitReturn"
             onclick="addReturn()">
-            Submit Return
+            Submit Kembali
           </button>
         </div>
       </div>
@@ -402,21 +388,21 @@
       <!-- Header -->
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-          <h2 class="fw-bold mb-1">Recaps</h2>
+          <h2 class="fw-bold mb-1">Rekap</h2>
           <p class="text-muted mb-0">
-            Record items distributed & returned by each classes.
+            Catat barang-barang yang dibagikan & dikembalikan oleh setiap kelas.
           </p>
         </div>
 
         <div class="d-flex gap-3 flex-wrap">
           <div class="badge-stock badge-purple">
             <i class="bi bi-upload"></i>
-            Distribution:
+            Distribusi:
             <span id="disRecaps">0</span>
           </div>
           <div class="badge-stock badge-purple">
             <i class="bi bi-arrow-counterclockwise"></i>
-            Return:
+            Kembali:
             <span id="retRecaps">0</span>
           </div>
         </div>
@@ -451,15 +437,15 @@
     <!-- REPORTS -->
     <section id="reports" class="d-none">
 
-      <h2>Reports & History</h2>
-      <p class="text-muted">View transaction history and generate reports.</p>
-      <p class="text-muted">Overview of MBG stock and recent activities.</p>
+      <h2>Laporan & Histori</h2>
+      <p class="text-muted">Lihat riwayat transaksi dan buat laporan.</p>
+      <p class="text-muted">Stok MBG</p>
 
       <div class="row g-4 mb-4">
         <div class="col-md-3">
           <div class="stat-card blue">
             <div class="stat-header">
-              <small>CURRENT STOCK</small>
+              <small>Stok Saat Ini</small>
               <i class="bi bi-box-seam"></i>
             </div>  
             <h3 id="dStockReport">0</h3>
@@ -469,7 +455,7 @@
         <div id="dBoxInReport" class="col-md-3">
           <div class="stat-card green">
             <div class="stat-header">
-              <small id="labelInReport">TODAY RECEIVED</small>
+              <small id="labelInReport">Datang Hari Ini</small>
               <i class="bi bi-download"></i>
             </div>
             <h3 id="dInReport">0</h3>
@@ -479,7 +465,7 @@
         <div id="dBoxOutReport" class="col-md-3">
           <div class="stat-card yellow">
             <div class="stat-header">
-              <small id="labelOutReport">TODAY DISTRIBUTED</small>
+              <small id="labelOutReport">Distribusi Hari Ini</small>
               <i class="bi bi-upload"></i>
             </div>
             <h3 id="dOutReport">0</h3>
@@ -489,7 +475,7 @@
         <div id="dBoxReturnReport" class="col-md-3">
           <div class="stat-card purple">
             <div class="stat-header">
-              <small id="labelReturnReport">TODAY RETURNED</small>
+              <small id="labelReturnReport">Kembali Hari Ini</small>
               <i class="bi bi-arrow-counterclockwise"></i>
             </div>
             <h3 id="dReturnReport">0</h3>
@@ -501,7 +487,7 @@
       <div class="card-box">
 
         <div class="d-flex justify-content-between align-items-center mb-3">
-          <h5 class="mb-0 fw-bold">Transaction History</h5>
+          <h5 class="mb-0 fw-bold">Histori Transaksi</h5>
 
           <div class="d-flex align-items-center gap-2 report-toolbar">
             <input type="date" id="filterFrom" class="form-control report-input">
@@ -509,11 +495,11 @@
             <input type="date" id="filterTo" class="form-control report-input">
 
             <select id="filterType" class="form-select report-input">
-              <option value="ALL">All Types</option>
-              <option value="INCOMING">Incoming</option>
+              <option value="ALL">Semua Tipe</option>
+              <option value="INCOMING">Datang</option>
               <option value="KEMBALI">Kembali</option>
-              <option value="DISTRIBUTION">Distribution</option>
-              <option value="RETURN">Return</option>
+              <option value="DISTRIBUTION">Distribusi</option>
+              <option value="RETURN">Kembali</option>
             </select>
 
             <button
@@ -532,11 +518,11 @@
           <table class="table align-middle">
             <thead>
               <tr>
-                <th>Date</th>
-                <th>Type</th>
-                <th>Details</th>
-                <th>Rep</th>
-                <th>Quantity</th>
+                <th>Tanggal</th>
+                <th>Tipe</th>
+                <th>Sumber/Kelas</th>
+                <th>Perwakilan</th>
+                <th>Jumlah</th>
                 <th>Actions</th>
               </tr>
             </thead>
